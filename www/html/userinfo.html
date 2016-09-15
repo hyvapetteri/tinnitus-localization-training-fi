@@ -1,0 +1,780 @@
+<div>
+  <div class="page-header">
+    <h1>Tervetuloa!</h1>
+  </div>
+  <p class="lead">Kiitos harjoitusohjelmaan rekisteröitymisestä, {{account.username}}!
+    Seuraavaksi haluaisimme tietää hieman lisää sinusta ja tinnituksestasi.
+  </p>
+
+
+  <div class="row">
+    <div class="col-sm-offset-2 col-sm-8 panel panel-default">
+      <div class="panel-body">
+        <iframe src="html/null.html" name="null"
+          style="display:none"></iframe>
+
+        <form name="infoForm"
+          action="null.html" target="null" method="post"
+          ng-submit="processInfo(info)"
+          novalidate form-autofill-fix role="form">
+
+<!--
+          <div class="form-group"
+               ng-class="{ 'has-error': (infoForm.email.$error.required || infoForm.email.$error.email) && infoForm.email.$touched }">
+            <label for="email" class="control-label">Email</label>
+            <input type="email" id="email" name="email"
+              ng-model="info.email" required="" class="form-control" autofocus=""></input>
+            <div class="help-block" ng-show="infoForm.$submitted || infoForm.email.$touched">
+              <span ng-show="infoForm.email.$error.required">Please give your email address.</span>
+              <span ng-show="infoForm.email.$error.email">The address you gave is not a valid email address.</span>
+            </div>
+          </div>
+-->
+
+          <div class="form-group"
+               ng-class="{ 'has-error': infoForm.age.$error.required && infoForm.age.$touched }">
+            <label for="age" class="control-label">Ikä</label>
+            <input type="number" id="age" name="age"
+              ng-model="info.age" required="" min="0" class="form-control"
+              placeholder="Ikä vuosina"></input>
+            <div class="help-block" ng-show="infoForm.$submitted || infoForm.age.$touched">
+              <span ng-show="infoForm.age.$error.required">Kerro ikäsi</span>
+              <span ng-show="infoForm.age.$error.integer || info.age.$error.min">Anna kokonaisluku</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="residence" class="control-label">Kotikaupunki</label>
+            <input type="text" id="residence" name="residence"
+              ng-model="info.residence" class="form-control"
+              placeholder="Kaupunki"></input>
+          </div>
+
+          <div class="form-group">
+            <label for="code" class="control-label">Mikäli sinulle on annettu osallistujatunniste, kirjoita se tähän</label>
+            <input type="text" id="code" name="code"
+              ng-model="info.code" class="form-control"
+              placeholder="Osallistujatunniste"></input>
+              <span class="help-block">Mikäli sinulla ei ole osallistujatunnistetta, jätä tämä tyhjäksi</span>
+          </div>
+
+          <div class="form-group">
+            <strong>Sukupuoli</strong>
+            <div class="radio">
+              <label>
+                <input type="radio" name="sex" id="sex1" value="female" ng-model="info.sex"></input>
+                Nainen
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="sex" id="sex2" value="male" ng-model="info.sex"></input>
+                Mies
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <strong>Kätisyys</strong>
+            <div class="radio">
+              <label>
+                <input type="radio" name="handedness" id="hand1" value="left" ng-model="info.hand"></input>
+                Vasenkätinen
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="handedness" id="hand2" value="right" ng-model="info.hand"></input>
+                Oikeakätinen
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="handedness" id="hand3" value="both" ng-model="info.hand"></input>
+                Molempikätinen
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <strong>Ovatko lähisukulaisesi valittaneet tinnituksesta?</strong>
+            <div class="radio">
+              <label>
+                <input type="radio" name="familyHistory" id="familyhistory1" value="yes" ng-model="info.familyHistory"></input>
+                Kyllä
+              </label>
+            </div>
+            <div ng-show="info.familyHistory == 'yes'">
+
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" name="historyParents" id="family1" ng-model="info.historyParents"></input>
+                  Vanhemmat
+                </label>
+              </div>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" name="historySiblings" id="family2" ng-model="info.historySiblings"></input>
+                  Sisarukset
+                </label>
+              </div>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" name="historyChildren" id="family3" ng-model="info.historyChildren"></input>
+                  Lapset
+                </label>
+              </div>
+            </div>
+
+            <div class="radio">
+              <label>
+                <input type="radio" name="familyHistory" id="familyhistory2" value="no" ng-model="info.familyHistory"></input>
+                Ei
+              </label>
+            </div>
+          </div>
+
+
+          <div class="form-group"
+               ng-class="{ 'has-error': infoForm.tinnDurationMonths.$error.max && infoForm.tinnDurationMonths.$touched }">
+            <strong>Kuinka pitkään sinulla on ollut tinnitusta?</strong>
+            <div class="row">
+              <div class="col-xs-6">
+                <label for="tinnDurationYears" class="control-label">Vuotta</label>
+                <input type="number" id="tinnDurationYears" name="tinnDurationYears"
+                  ng-model="info.durationYears" required="" min="0" class="form-control"
+                  value="0" placeholder="Vuodet"></input>
+              </div>
+              <div class="col-xs-6">
+                <label for="tinnDurationMonths" class="control-label">Kuukautta</label>
+                <input type="number" id="tinnDurationMonths" name="tinnDurationMonths"
+                  ng-model="info.durationMonths" required="" min="0" class="form-control"
+                  value="0" max="12" placeholder="Kuukaudet"></input>
+              </div>
+              <div class="help-block" ng-show="infoForm.$submitted || infoForm.age.$touched">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <strong>Alkoiko tinnituksesi äkillisesti vai vähitellen?</strong>
+            <div class="radio">
+              <label>
+                <input type="radio" name="start" id="start1" value="abrupt" ng-model="info.start"></input>
+                Äkillisesti
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="start" id="start2" value="gradual" ng-model="info.start"></input>
+                Vähitellen
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <strong>Liittyikö tinnituksen ilmaantumiseen yksi tai useampi allaolevista tekijöistä?</strong>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" name="initialBlast" id="initial1" ng-model="info.initialContinuousSound"></input>
+                Voimakas jatkuva ääni
+              </label>
+            </div>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" name="initialBlast" id="initial1" ng-model="info.initialBlast"></input>
+                Voimakas pamahdus
+              </label>
+            </div>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" name="initialWhiplash" id="initial2" ng-model="info.initialWhiplash"></input>
+                Niskan retkahdusvamma (<em>piiskaniskuvamma, whiplash</em>)
+              </label>
+            </div>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" name="initialChangedHearing" id="initial3" ng-model="info.initialChangedHearing"></input>
+                Muutoksia kuulossa
+              </label>
+            </div>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" name="initialStress" id="initial4" ng-model="info.initialStress"></input>
+                Stressiä
+              </label>
+            </div>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" name="initialHeadTrauma" id="initial5" ng-model="info.initialHeadTrauma"></input>
+                Päähän kohdistunut vamma
+              </label>
+            </div>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" name="initialOthers" id="initial6" ng-model="info.initialOthers"></input>
+                Joku muu
+              </label>
+            </div>
+            <textarea ng-show="info.initialOthers" class="form-control" rows="3"
+                ng-model="info.initialOthersText" placeholder="Ole hyvä ja kuvaile omin sanoin mihin tinnituksen alku liittyi"></textarea>
+          </div>
+
+          <div class="form-group">
+            <strong>Onko tinnitusääni sykkivä?</strong>
+            <div class="radio">
+              <label>
+                <input type="radio" name="pulsatile" id="pulsatile1" value="heartbeat" ng-model="info.pulsatile"></input>
+                Kyllä, ääni sykkii sydämen lyöntien tahtiin
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="pulsatile" id="pulsatile2" value="pulsatile" ng-model="info.pulsatile"></input>
+                Kyllä, mutta ääni <strong>ei</strong> syki sydämen lyöntien tahtiin
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="pulsatile" id="pulsatile3" value="no" ng-model="info.pulsatile"></input>
+                Ei ole
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <strong>Minne paikallistat tinnitusäänen?</strong>
+            <div class="radio">
+              <label>
+                <input type="radio" name="tinnlocation" id="tinnlocation1" value="right" ng-model="info.tinnlocation"></input>
+                Oikeaan korvaan
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="tinnlocation" id="tinnlocation2" value="left" ng-model="info.tinnlocation"></input>
+                Vasempaan korvaan
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="tinnlocation" id="tinnlocation3" value="bothleft" ng-model="info.tinnlocation"></input>
+                Molempiin korviin, painottuen vasemmalle
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="tinnlocation" id="tinnlocation4" value="bothright" ng-model="info.tinnlocation"></input>
+                Molempiin korviin, painottuen oikealle
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="tinnlocation" id="tinnlocation5" value="bothequal" ng-model="info.tinnlocation"></input>
+                Molempiin korviin yhtälailla
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="tinnlocation" id="tinnlocation6" value="inside" ng-model="info.tinnlocation"></input>
+                Pään sisälle
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="tinnlocation" id="tinnlocation7" value="else" ng-model="info.tinnlocation"></input>
+                Muualle, minne?
+              </label>
+            </div>
+            <input ng-show="info.tinnlocation == 'else'" type="text"
+                placeholder="Minne?" class="form-control"
+                ng-model="info.tinnlocationElse"></input>
+          </div>
+
+          <div class="form-group">
+            <strong>Miten tinnitusta esiintyy ajallisesti?</strong>
+            <div class="radio">
+              <label>
+                <input type="radio" name="tinnconstant" id="tinnconstant1" value="intermittent" ng-model="info.tinnconstant"></input>
+                Ajoittain, vain silloin tällöin
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="tinnconstant" id="tinnconstant2" value="constant" ng-model="info.tinnconstant"></input>
+                Jatkuvasti
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <strong>Vaihteleeko tinnituksen voimakkuus päivästä toiseen?</strong>
+            <div class="radio">
+              <label>
+                <input type="radio" name="loudnessvary" id="loudnessvary1" value="yes" ng-model="info.loudnessvary"></input>
+                Kyllä
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="loudnessvary" id="loudnessvary2" value="no" ng-model="info.loudnessvary"></input>
+                Ei
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="loudnessvas">Asteikolla nollasta sataan, kuinka voimakasta tinnituksesi on keskimäärin ollut
+              edellisen kuukauden aikana?</label>
+            <span class="help-block">(0 = ei ääntä, 100 = voimakkain kuviteltavissa oleva ääni)</span>
+            <input id="loudnessvas" name="loudnessvas" type="range" min="0" max="100" step="1" ng-model="info.loudnessvas"></input>
+            <span class="help-block" ng-show="!info.loudnessvas">Valitse sopiva arvo liukuvalitsimella</span>
+            <span class="help-block" ng-show="!!info.loudnessvas">Voimakkuus: {{info.loudnessvas}}</span>
+          </div>
+
+          <div class="form-group">
+            <label for="tinnitusDescription">Kuvaile omin sanoin miltä tinnituksesi yleensä kuulostaa.</label>
+            <textarea id="tinnitusDescription" name="tinnitusDescription"
+                ng-model="info.tinnitusDescription" placeholder="Kuvaile tinnitusääntä"
+                class="form-control" rows="4"></textarea>
+            <span class="help-block">
+              Kuvaile tinnitusta vapaasti sellaisin sanoin jotka parhaiten kuvaavat
+              aistimustasi. Esimerkkejä tinnitusta kuvailevista termeistä voisivat olla:
+              sihisevä, pirisevä, viheltävä, sykkivä, suriseva, napsuva, kilisevä,
+              raksahteleva, sirittävä, piippaava, tuuttaava, humiseva, poksuva,
+              vyöryvä, kohiseva, kirjoituskonemainen, pulppuileva.
+            </span>
+          </div>
+
+          <div class="form-group">
+            <strong>Kuulostaako tinnituksesi enemmän piippaukselta vai suhinalta?</strong>
+            <div class="radio">
+              <label>
+                <input type="radio" name="tinnitussound" id="tinnitussound1" value="tone" ng-model="info.tinnitussound"></input>
+                Piippaus
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="tinnitussound" id="tinnitussound2" value="noise" ng-model="info.tinnitussound"></input>
+                Suhina
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="tinnitussound" id="tinnitussound3" value="other" ng-model="info.tinnitussound"></input>
+                Ei kumpikaan (selitys edellisessä kohdassa)
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <strong>Mikä on tinnitusäänesi korkeus?</strong>
+            <div class="radio">
+              <label>
+                <input type="radio" name="tinnpitch" id="tinnpitch1" value="veryhigh" ng-model="info.tinnpitch"></input>
+                Erittäin korkea ääni
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="tinnpitch" id="tinnpitch2" value="high" ng-model="info.tinnpitch"></input>
+                Korkea ääni
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="tinnpitch" id="tinnpitch3" value="mid" ng-model="info.tinnpitch"></input>
+                Ei erityisen korkea tai matala ääni
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="tinnpitch" id="tinnpitch4" value="low" ng-model="info.tinnpitch"></input>
+                Matala ääni
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="awarenessvas">
+              Edellisen kuukauden aikana, kuinka suuren osan valveillaoloajastasi olet ollut
+              tietoinen tinnitusäänestäsi?
+            </label>
+            <input id="awarenessvas" name="awarenessvas" type="range" min="1" max="100" step="1" ng-model="info.awarenessvas"></input>
+            <span class="help-block" ng-show="!info.awarenessvas">Valitse sopiva arvo liukuvalitsimella</span>
+            <span class="help-block" ng-show="!!info.awarenessvas">Tiedostan tinnitusäänen {{info.awarenessvas}}% valveillaoloajastani</span>
+          </div>
+
+          <div class="form-group">
+            <label for="irritatedpercent">
+              Edellisen kuukauden aikana, kuinka suuren osan valveillaoloajastasi olet ollut
+              ärsyyntynyt, hätääntynyt, tai ahdistunut tinnituksesi vuoksi?
+            </label>
+            <input id="irritatedpercent" name="irritatedpercent" type="range" min="1" max="100" step="1" ng-model="info.irritatedpercent"></input>
+            <span class="help-block" ng-show="!info.irritatedpercent">Valitse sopiva arvo liukuvalitsimella</span>
+            <span class="help-block" ng-show="!!info.irritatedpercent">Ärsyyntynyt, hätääntynyt, tai ahdistunut {{info.irritatedpercent}}% valveillaoloajastani</span>
+          </div>
+
+          <div class="form-group">
+            <strong>Oletko aiemmin saanut tai saatko tällä hetkellä hoitoa tinnitukseesi?</strong>
+            <span class="help-block">Mikäli et saa tai ole saanut hoitoa, jätä tämä kohta tyhjäksi.</span>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" name="previousTreatment" id="previousTreatment1" ng-model="info.previousTreatment"></input>
+                Kyllä, aiemmin
+              </label>
+            </div>
+            <textarea ng-show="info.previousTreatment" class="form-control" rows="3"
+                ng-model="info.previousTreatmentDescription"
+                placeholder="Kuvaile saamiasi hoitoja"></textarea>
+
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" name="currentTreatment" id="currentTreatment1"
+                ng-model="info.currentTreatment"></input>
+                Kyllä, tällä hetkellä
+              </label>
+            </div>
+            <textarea ng-show="info.currentTreatment" class="form-control" rows="3"
+                ng-model="info.currentTreatmentDescription"
+                placeholder="Kuvaile tämänhetkistä hoitoasi"></textarea>
+          </div>
+
+          <div class="form-group">
+            <strong>Helpottavatko jokapäiväiset ympäristön äänet tinnitustasi?</strong>
+            <span class="help-block">Nämä voivat olla sellaisia ääniä kuten vesihanan tai suihkun kohina,
+              liikenteen äänet, TV tai radio, puheensorina, jne.</span>
+            <div class="radio">
+              <label>
+                <input type="radio" name="environmentalsounds" id="environmentalsounds1" value="yes" ng-model="info.environmentalsounds"></input>
+                Kyllä
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="environmentalsounds" id="environmentalsounds2" value="no" ng-model="info.environmentalsounds"></input>
+                Ei
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <strong>Pahentaako kova melu tinnitustasi?</strong>
+            <div class="radio">
+              <label>
+                <input type="radio" name="noiseworse" id="noiseworse1" value="yes" ng-model="info.noiseworse"></input>
+                Kyllä
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="noiseworse" id="noiseworse2" value="no" ng-model="info.noiseworse"></input>
+                Ei
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <strong>Onko pään, niskan tai hartioiden asennolla tai liikkeillä minkäänlaista
+              vaikutusta tinnitusääneen?</strong>
+            <span class="help-block">
+              esim. leuan työntäminen eteenpäin, hampaiden yhteen pureminen,
+              pään kallistaminen, hartioiden kohauttaminen, niskan/korvien/käsivarsien/pään koskeminen, ...
+            </span>
+            <div class="radio">
+              <label>
+                <input type="radio" name="somatosensory" id="somatosensory1" value="yes" ng-model="info.somatosensory"></input>
+                Kyllä
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="somatosensory" id="somatosensory2" value="no" ng-model="info.somatosensory"></input>
+                Ei
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <strong>Jos otat päiväunet, onko sillä vaikutusta tinnitukseen?</strong>
+            <div class="radio">
+              <label>
+                <input type="radio" name="napping" id="napping1" value="worse" ng-model="info.napping"></input>
+                Se pahentaa tinnitusta
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="napping" id="napping2" value="better" ng-model="info.napping"></input>
+                Tinnitus helpottaa
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="napping" id="napping3" value="no" ng-model="info.napping"></input>
+                Ei vaikutusta tinnitukseen
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <strong>Oletko huomannut yhteyttä yöunien ja tinnituksen välillä?</strong>
+            <div class="radio">
+              <label>
+                <input type="radio" name="nightsleep" id="nightsleep1" value="yes" ng-model="info.nightsleep"></input>
+                Kyllä
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="nightsleep" id="nightsleep2" value="no" ng-model="info.nightsleep"></input>
+                Ei
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <strong>Kuinka stressi vaikuttaa tinnitukseesi?</strong>
+            <div class="radio">
+              <label>
+                <input type="radio" name="stress" id="stress1" value="worse" ng-model="info.stress"></input>
+                Se pahentaa tinnitusta
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="stress" id="stress2" value="better" ng-model="info.stress"></input>
+                Tinnitus helpottaa
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="stress" id="stress3" value="no" ng-model="info.stress"></input>
+                Ei vaikutusta tinnitukseen
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="medicationDescription">Onko lääkkeillä vaikutusta tinnitukseesi?
+              Luettele ne lääkkeet joilla olet huomannut olevan vaikutusta ja kuvaile miten ne vaikuttavat.</label>
+            <textarea id="medicationDescription" name="medicationDescription"
+                ng-model="info.medicationDescription" placeholder="Kuvaile lääkityksen vaikutuksia tinnitukseesi"
+                class="form-control" rows="4"></textarea>
+          </div>
+
+          <div class="form-group">
+            <strong>Onko sinulla kuulovaikeuksia?</strong>
+            <div class="radio">
+              <label>
+                <input type="radio" name="hearingproblem" id="hearingproblem1" value="yes" ng-model="info.hearingproblem"></input>
+                Kyllä
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="hearingproblem" id="hearingproblem2" value="no" ng-model="info.hearingproblem"></input>
+                Ei
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <strong>Käytätkö kuulolaitetta?</strong>
+            <div class="radio">
+              <label>
+                <input type="radio" name="hearingaid" id="hearingaid1" value="yes" ng-model="info.hearingaid"></input>
+                Kyllä
+              </label>
+            </div>
+            <div ng-show="info.hearingaid == 'yes'">
+              <div class="radio">
+                <label>
+                  <input type="radio" name="hearingaidside" id="hearingaidside1" value="right" ng-model="info.hearingaidside"></input>
+                  Kuulolaite oikeassa korvassa
+                </label>
+              </div>
+              <div class="radio">
+                <label>
+                  <input type="radio" name="hearingaidside" id="hearingaidside2" value="left" ng-model="info.hearingaidside"></input>
+                  Kuulolaite vasemmassa korvassa
+                </label>
+              </div>
+              <div class="radio">
+                <label>
+                  <input type="radio" name="hearingaidside" id="hearingaidside3" value="both" ng-model="info.hearingaidside"></input>
+                  Kuulolaite molemmissa korvissa
+                </label>
+              </div>
+            </div>
+
+            <div class="radio">
+              <label>
+                <input type="radio" name="hearingaid" id="hearingaid2" value="no" ng-model="info.hearingaid"></input>
+                Ei
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <strong>Oletko herkkä koville äänille?</strong>
+            <span class="help-block">
+              Onko sinulla vaikeuksia sietää ääniä koska ne tuntuvat liian voimakkailta,
+              vaikka samassa tilanteessa muut ihmiset ympärilläsi eivät häiriintyisi niistä.
+            </span>
+            <div class="radio">
+              <label>
+                <input type="radio" name="hyperacusia" id="hyperacusia1" value="never" ng-model="info.hyperacusia"></input>
+                Ei koskaan
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="hyperacusia" id="hyperacusia2" value="rarely" ng-model="info.hyperacusia"></input>
+                Harvoin
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="hyperacusia" id="hyperacusia3" value="sometimes" ng-model="info.hyperacusia"></input>
+                Joskus
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="hyperacusia" id="hyperacusia4" value="usually" ng-model="info.hyperacusia"></input>
+                Usein
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="hyperacusia" id="hyperacusia5" value="always" ng-model="info.hyperacusia"></input>
+                Aina
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <strong>Voivatko äänet aiheuttaa sinulle kipua tai fyysisesti epämukavaa oloa?</strong>
+            <div class="radio">
+              <label>
+                <input type="radio" name="paindiscomfort" id="paindiscomfort1" value="yes" ng-model="info.paindiscomfort"></input>
+                Kyllä
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="paindiscomfort" id="paindiscomfort2" value="no" ng-model="info.paindiscomfort"></input>
+                Ei
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <strong>Esiintyykö sinulla toistuvasti päänsärkyä?</strong>
+            <div class="radio">
+              <label>
+                <input type="radio" name="headache" id="headache1" value="yes" ng-model="info.headache"></input>
+                Kyllä
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="headache" id="headache2" value="no" ng-model="info.headache"></input>
+                Ei
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <strong>Esiintyykö sinulla toistuvasti tasapainohäiriöitä tai huimausta?</strong>
+            <div class="radio">
+              <label>
+                <input type="radio" name="vertigo" id="vertigo1" value="yes" ng-model="info.vertigo"></input>
+                Kyllä
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="vertigo" id="vertigo2" value="no" ng-model="info.vertigo"></input>
+                Ei
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <strong>Onko sinulla todettu purentaelimistön toimintahäiriöitä?</strong>
+            <div class="radio">
+              <label>
+                <input type="radio" name="tmd" id="tmd1" value="yes" ng-model="info.tmd"></input>
+                Kyllä
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="tmd" id="tmd2" value="no" ng-model="info.tmd"></input>
+                Ei
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <strong>Esiintyykö sinulla toistuvasti niskasärkyä?</strong>
+            <div class="radio">
+              <label>
+                <input type="radio" name="neckpain" id="neckpain1" value="yes" ng-model="info.neckpain"></input>
+                Kyllä
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="neckpain" id="neckpain2" value="no" ng-model="info.neckpain"></input>
+                Ei
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <strong>Esiintyykö sinulla toistuvasti muuta kipua?</strong>
+            <div class="radio">
+              <label>
+                <input type="radio" name="otherpain" id="otherpain1" value="yes" ng-model="info.otherpain"></input>
+                Kyllä
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="otherpain" id="otherpain2" value="no" ng-model="info.otherpain"></input>
+                Ei
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <strong>Hoidetaanko sinua tällä hetkellä minkään psykiatrisen ongelman vuoksi?</strong>
+            <div class="radio">
+              <label>
+                <input type="radio" name="psychiatric" id="psychiatric1" value="yes" ng-model="info.psychiatric"></input>
+                Kyllä
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="psychiatric" id="psychiatric2" value="no" ng-model="info.psychiatric"></input>
+                Ei
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-default">Tallenna</button>
+
+          <div ng-show="signupsuccess">Rekisteröityminen valmis!</div>
+          <div ng-show="signuperror == 'network'">
+            Yhteydessä näyttää olevan ongelmia, tarkista verkkoyhteys ja yritä tallentaa uudelleen!
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,123 @@
+<div>
+  <span ng-show="currentsession.stage == 'training'">
+    <div class="page-header">
+      <h1>Kuunteluharjoitus</h1>
+    </div>
+    <p ng-show="currentsession.mode == 'baseline'" class="lead">
+      Ensimmäisellä harjoituskerralla määritämme lähtötasosi. Tässä
+      harjoituksessa et saa tietää, vastasitko oikein.
+    </p>
+    <p>
+      Kun olet valmis aloittamaan, paina 'play' ja kuuntele tarkasti. Kuulet kaksi
+      ääntä peränjälkeen, joista ensimmäinen sijoittuu keskelle ja toinen joko vasemmalle
+      tai oikealle. Äänet voivat sijoittua pään sisälle tai kuulostaa siltä kuin ne
+      tulisivat pään ulkopuolelta, mutta tärkeintä on kuunnella mihin suuntaan
+      ääni mielestäsi liikkuu: vasemmalle vai oikealle. Kun olet kuunnellut äänet,
+      anna vastauksesi painamalla jompaa kumpaa vastauspainiketta. Kun olet valmis
+      kuuntelemaan seuraavan äänen, paina taas 'play'.
+    </p>
+    <p>
+      Yritä kuunnella tarkasti kumpaan suuntaan ääni liikkuu. Ei haittaa vaikka et
+      varmuudella tietäisi kumpi on oikea vastaus: tällöin voit vain arvata.
+    </p>
+    <p>
+      Mikäli sinun on helpompi keskittyä silmät kiinni, voit myös käyttää näppäimistöä
+      harjoituksen tekemiseen: soita seuraavat äänet painamalla välilyöntiä, ja anna vastauksesi
+      nuolinäppäimillä (vasemmalle: vasen nuolinäppäin, oikealle: oikea nuolinäppäin).
+    </p>
+    <p ng-show="currentsession.mode == 'baseline'">
+      Jatka niin kauan kunnes saat ilmoituksen harjoituksen loppumisesta. Lähtötason määrittämiseen
+      menee pidempi aika kuin varsinaiseen harjoitukseen.
+    </p>
+  </span>
+  <span ng-show="currentsession.stage == 'warmup'">
+    <div class="page-header">
+      <h1>Lämmittely</h1>
+    </div>
+    <p>
+      Aloitamme lämmittelyllä. Tarkoituksena on totutella kuunteluharjoituksen
+      tehtävään: Kuulet kaksi
+      ääntä peränjälkeen, joista ensimmäinen sijoittuu keskelle ja toinen joko vasemmalle
+      tai oikealle. Äänet voivat sijoittua pään sisälle tai kuulostaa siltä kuin ne
+      tulisivat pään ulkopuolelta, mutta tärkeintä on kuunnella mihin suuntaan
+      ääni mielestäsi liikkuu: vasemmalle vai oikealle. Nyt lämmittelyvaiheessa
+      voit itse valita kumpaan suuntaan ääni liikkuu ja keskittyä tunnistamaan
+      eroja eri suuntiin liikkuvissa äänissä.
+    </p>
+    <p>
+      Yritä kuunnella tarkasti kumpaan suuntaan ääni liikkuu.
+      Mikäli sinun on helpompi keskittyä silmät kiinni, voit myös käyttää näppäimistöä
+      lämmittelyvaiheessa: kuuntele vasemmalle liikkuva ääni painamalla vasenta nuolinäppäintä
+      ja oikealle liikkuva ääni painamalla oikeaa nuolinäppäintä.
+    </p>
+  </span>
+
+  <div class="row">
+    <div class="col-sm-offset-3 col-sm-6 panel panel-default">
+      <div class="panel-body text-center" ng-hide="currentsession.stage == 'warmup'">
+        <button type="button" class="btn" ng-disabled="play_disabled" ng-click="play()">&#9658; Play (välilyönti)</button><br/>
+        <br/>
+        <button type="button" class="btn" ng-disabled="answer_disabled" ng-click="check_answer('left')">(&#x2190;) Vasemmalle</button>
+        <button type="button" class="btn" ng-disabled="answer_disabled" ng-click="check_answer('right')">Oikealle (&#x2192;)</button>
+        <br/><br/>
+        <div ng-show="msg || (currentsession.mode == 'baseline')" style="height: 2em"><span style="vertical-align: middle">{{msg}}</span></div>
+        <div ng-show="currentsession.mode == 'training'">
+          <div ng-show="!msg && (correct == true)" style="height: 2em; vertical-align: middle"><span class="label label-success">Oikein!</span></div>
+          <div ng-show="!msg && (correct == false)" style="height: 2em"><span class="label label-danger">Väärin</span></div>
+        </div>
+        <br/>
+        <div class="progress">
+          <div class="progress-bar" role="progressbar" ng-style="progressstyle"></div>
+        </div>
+      </div>
+      <div class="panel-body text-center" ng-show="currentsession.stage == 'warmup'">
+        <button type="button" class="btn" ng-disabled="answer_disabled" ng-click="warmup('left');play();">(&#x2190;) Vasemmalle</button>
+        <button type="button" class="btn" ng-disabled="answer_disabled" ng-click="warmup('right');play();">Oikealle (&#x2192;)</button>
+        <br/><br/>
+        <div ng-show="msg || (currentsession.mode == 'baseline')" style="height: 2em"><span style="vertical-align: middle">{{msg}}</span></div>
+        <br/>
+        <button type="button" class="btn" ng-click="openModal();" ng-show="currentsession.stage == 'warmup'">Valmis</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/ng-template" id="finishedModal.html">
+    <div class="modal-header">
+        <h3 class="modal-title">Valmis!</h3>
+    </div>
+    <div class="modal-body">
+      <span ng-hide="currentsession.stage == 'warmup'">
+        <p ng-if="(currentsession.mode == 'training') && !settings.training_target_reached">
+          Harjoitus on nyt valmis! Sait {{(correct_counter*100)/counter}}%
+          vastauksistasi oikein! Seuraavaksi siirryt takaisin etusivulle, josta
+          voit joko aloittaa uuden harjoituksen tai lopettaa harjoituskerran.
+        </p>
+        <p ng-if="(currentsession.mode == 'training') && settings.training_target_reached">
+          Harjoitus on nyt valmis! Sait {{(correct_counter*100)/counter}}%
+          vastauksistasi oikein ja olet saavuttanut harjoitustavoitteen!
+          Palaa huomenna tekemään vielä viimeinen testi, josta selvitämme miten olet
+          kehittynyt kuuntelutarkkuudessa.
+        </p>
+        <p ng-if="(currentsession.mode == 'baseline') && (which_freq == 'f1')">
+          Kiitos! Seuraavaksi sama testi tehdään toisella äänellä!
+        </p>
+        <p ng-if="(currentsession.mode == 'baseline') && (which_freq == 'f2')">
+          Kiitos! Ensimmäinen harjoituskerta on nyt valmis! Voit jatkaa huomenna
+          harjoituksilla, joissa pyrimme kehittämään kuuntelutarkkuuttasi! Nämä
+          samat testit tehdään uudestaan harjoittelun päätyttyä, jolloin saamme
+          tietää miten olet parantanut kuuntelutaitoasi.
+        </p>
+      </span>
+      <span ng-show="currentsession.stage == 'warmup'">
+        <p>
+          Toivottavasti olet nyt lämmitellyt tarpeeksi, seuraavaksi siirrymme
+          varsinaiseen harjoitukseen!
+        </p>
+      </span>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
+    </div>
+</script>
+<audio id="finishedAudio" src="/sounds/finished.wav" volume="0.02" type="audio/wav"></audio>

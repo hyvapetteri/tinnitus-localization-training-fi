@@ -1,0 +1,135 @@
+<div class="jumbotron">
+  <div class="page-header">
+    <h1>Tervetuloa!</h1>
+  </div>
+  <div ng-hide="!!account.username">
+    <p class="lead">
+      Tervetuloa HYKS kuulokeskuksen tinnituspotilaille tarkoitettuun kuunteluharjoitteluohjelmaan!
+    </p>
+    <p>
+      Ole hyvä ja <a href="#/login">kirjaudu sisään</a> aloittaaksesi harjoittelun,
+      tai <a href="#/signup">rekisteröidy</a> tutkimukseen mikäli sinulla ei ole
+      vielä käyttäjätunnusta!
+    </p>
+  </div>
+  <div ng-show="!!account.username && !settings.training_target_reached">
+    <p>
+      Tervetuloa HYKS kuulokeskuksen tinnituspotilaille tarkoitettuun kuunteluharjoitteluohjelmaan,
+      {{account.username}}!
+    </p>
+    <p>
+      Ennen kuin aloitat, kytke kuulokkeet kiinni tietokoneeseen
+      ja vaimenna tietokoneen kaiuttimet. Jotta harjoittelu ei häiriintyisi,
+      sulje myös muut ohjelmat ja selaimen välilehdet (esim.
+      facebook) jotka voivat tuottaa ääniä, ja etsi hiljainen ja rauhallinen paikka
+      jossa voit tehdä harjoitukset.
+    </p>
+    <p>
+      Tavoitteena on suorittaa joko kahdeksan harjoituskertaa, tai saada vähintään
+      85% oikein vaikealla harjoitustasolla.
+    </p>
+  </div>
+  <div ng-show="!!account.username && settings.training_target_reached">
+    <p>
+      Olet saavuttanut harjoitustavoitteesi, eli joko kahdeksan harjoituskertaa
+      tai vähintään 85% oikein vaikealla harjoitustasolla, onneksi olkoon!
+    </p>
+    <p>
+      Tee vielä kuuntelutarkkuutta mittaava testi <u>seuraavana päivänä
+      viimeisen harjoituskerran jälkeen</u>. Valitse alta 'Tee testi'.
+    </p>
+  </div>
+</div>
+
+<div class="row" ng-show="!!account.username">
+  <div class="col-sm-6">
+    <h4>Toiminnot</h4>
+    <p ng-show="!currentsession">
+      <a href="#" ng-hide="settings.training_target_reached" ng-click="$event.preventDefault(); startNewSession()">Aloita uusi harjoituskerta</a>
+      <a href="#" ng-show="settings.training_target_reached" ng-click="$event.preventDefault(); startNewSession('baseline')">Tee testi</a>
+    </p>
+    <p ng-show="!!currentsession">Käynnissä olevalla harjoituskerralla olet
+      suorittanut
+      <span ng-show="currentsession.exercises.length > 1">
+      {{currentsession.exercises.length}} harjoitusta:</span>
+      <span ng-show="currentsession.exercises.length == 1"> yhden harjoituksen:</span>
+    </p>
+      <ul>
+        <li ng-repeat="exercise in currentsession.exercises">
+          {{exercise.difficulty}} harjoitus, {{(exercise.correct_counter * 100)/50}}% oikein
+        </li>
+      </ul>
+    <p ng-show="!!currentsession">
+      <span ng-show="(currentsession.mode !== 'baseline')">
+        <a href="#" ng-show="(currentsession.preparations == 'done')" ng-click="$event.preventDefault(); startNewExercise()">Aloita uusi harjoitus</a>
+        <a href="#/vas" ng-show="(currentsession.preparations !== 'done')">Tee harjoitusvalmistelut</a>
+      </span>
+      <a href="#/vas" ng-show="currentsession.mode == 'baseline'">Aloita testi</a><br/>
+      <a href="#" ng-click="$event.preventDefault(); finishSession()">Lopeta harjoituskerta</a>
+    </p>
+  </div>
+  <div class="col-sm-6" ng-show="!!sessions.length">
+    <h4>Harjoituskertoja tähän mennessä: {{training_sessions}} </h4>
+    <ul>
+      <li ng-repeat="session in sessions | orderBy: 'createdAt'">
+        <span ng-show="session.mode == 'baseline'">Testikerta</span>
+        <span ng-show="session.mode == 'training'">Harjoituskerta</span>
+        {{session.createdAt | date:'longDate'}}
+        <ul ng-show="session.mode !== 'baseline'">
+          <li ng-repeat="exercise in session.exercises">
+            {{exercise.difficulty}} harjoitus, {{(exercise.correct_counter * 100)/50}}% oikein
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <h4>Tietoa</h4>
+    <p>
+      Tämä sivu on osa HYKS kuulokeskuksen tutkimusta. Sivuston tarkoituksena on
+      tarjota yksilöityä auditorista harjoittelua tinnituspotilaille.
+    </p>
+    <p>
+      Tässä tutkimuksessa tarkoituksena on harjoittaa suuntakuuloa päivittäin
+      yksinkertaisella kuuntelutehtävällä: harjoituksen aikana kuulet kaksi
+      peräkkäistä ääntä ja tehtävänäsi on kertoa liikkuiko jälkimmäinen ääni
+      oikealle vai vasemmalle. Vaikka tehtävä on yksinkertainen, haastetta riittää
+      kun äänen liike on hyvin pieni. Voit valita kolmen vaikeustason välillä ja
+      pyrkiä näin parantamaan kuuntelutarkkuuttasi.
+    </p>
+    <p>
+      Kuunteluharjoittelun on tutkimuksissa havaittu usein helpottavan tinnitusoireita,
+      ainakin jonkin verran. Siinä missä aiemmissa tutkimuksissa on keskitytty
+      taajuuserottelun harjoittelemiseen tai passiiviseen musiikin kuunteluun,
+      tässä tutkimuksessa selvitetään kuinka suuntakuuloharjoituksella voitaisiin
+      vaikuttaa tinnitukseen. Tutkimusryhmämme on aiemmissa tutkimuksissa löytänyt viitteitä
+      sille, että tinnitus voisi näkyä eroavaisuuksina suuntakuulon tarkkuudessa,
+      ja olemme kiinnostuneita siitä, voisiko kuulon tarkkuuden parantaminen johtaa
+      positiivisiin muutoksiin myös tinnitusta ylläpitävissä aivojen osissa.
+    </p>
+  </div>
+</div>
+
+
+<script type="text/ng-template" id="exerciseModal.html">
+    <div class="modal-header">
+        <h3 class="modal-title">Uusi harjoitus</h3>
+    </div>
+    <div class="modal-body">
+      <form name="startExerciseForm">
+        <label for="exerciseDifficulty">Valitse harjoituksen vaikeustaso</label><br/>
+        <select name="difficultySetting" id="difficultySetting" ng-model="exerciseDifficultySetting">
+          <option value="easy" selected="selected">helppo</option>
+          <option value="medium">keskivaikea</option>
+          <option value="hard">vaikea</option>
+        </select>
+      </form>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
+        <button class="btn btn-warning" type="button" ng-click="cancel()">Peruuta</button>
+    </div>
+</script>

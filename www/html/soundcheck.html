@@ -1,0 +1,30 @@
+<div>
+  <div class="page-header">
+    <h1>Tietokoneen äänentason säätö</h1>
+  </div>
+
+  <p class="lead">
+    Säädä tietokoneesi äänenvoimakkuus nollaan. Sitten paina 'play'-nappulaa
+    ja säädä tietokoneen äänenvoimakkuus sopivalle tasolle: ei liian kovalle mutta
+    ei liian hiljaisellekaan. Tämä ei vaikuta itse testin äänenvoimakkuuteen, vaan tarkoituksena
+    on etsiä sopiva lähtötaso seuraaville valmisteleville vaiheille. <strong>On
+    ehdottoman tärkeää, että tietokoneen äänenvoimakkuutta ei säädetä enää tämän vaiheen jälkeen!</strong>
+  <br/>
+  <div class="row">
+    <div class="col-sm-offset-3 col-sm-6 panel panel-default">
+      <div class="panel-body text-center">
+        <button type="button" class="btn" ng-click="play()" ng-bind-html="buttonTxt|unicode"></button><br/><br/>
+        Varmista, että kuulokkeesi ovat oikein päin päässä. Klikkaa allaolevia nappeja ja kuuntele kumpaakin
+        kanavaa erikseen. Mikäli vasen kanava kuuluukin oikeassa korvassa ja päinvastoin,
+        käännä kuulokkeet toisin päin päässä ja tarkista uudelleen.<br/><br/>
+        <button type="button" class="btn" ng-class="leftBtnClass" ng-click="panner('left')">Vasen</button>
+        <button type="button" class="btn" ng-class="rightBtnClass" ng-click="panner('right')">Oikea</button>
+        <br/><br/>
+        Kirjoita vielä alle käyttämiesi kuulokkeiden merkki ja malli:<br/>
+        <input type="text" ng-model="headphones" name="headphones" class="form-control"></input><br/><br/>
+        <button type="button" class="btn btn-default" ng-click="ready()">Valmis &rsaquo;</button>
+      </div>
+    </div>
+  </div>
+</div>
+<audio id="testAudio" src="/sounds/beethoven_string_quartet_9_part.mp3" type="audio/mp3"></audio>

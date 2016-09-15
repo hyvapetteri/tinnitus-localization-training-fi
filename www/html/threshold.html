@@ -1,0 +1,52 @@
+<div>
+  <div class="page-header">
+    <h1>Kuulokynnys</h1>
+  </div>
+  <p class="lead">Nyt etsimme kuulokynnyksen kuunteluharjoituksen testiäänille.</p>
+  <p>
+    Kun olet valmis aloittamaan kuulokynnyksen määrittämisen, paina 'play'.
+    Kuulokkeista alkaa kuulua jatkuva sihisevä/suhiseva ääni, joka on aluksi hyvin hiljainen
+    mutta voimistuu hiljalleen
+    (luultavasti et kuule ääntä aluksi, joten odota rauhassa kunnes kuulet sen selkeästi).
+    Kun kuulet äänen, paina 'Ääni kuuluu'-nappia ja <strong>pidä se pohjaan painettuna</strong>.
+    Pidä nappia pohjaan painettuna kunnes et enää kuule ääntä ja päästä painallus irti.<br/>
+    Jatka vuorottelua näiden välillä (kuulen äänen &#x2192; nappi pohjaan painettuna;
+    en kuule ääntä &#x2192; vapauta napin painallus) kunnes sivun alalaidassa näkyvä
+    palkki täyttyy.<br/>
+    Tämä sama toimenpide toistetaan kaksi kertaa eri korkuisilla äänillä.
+  </p>
+
+  <div class="text-center">
+    <button type="button" class="btn" ng-click="play()" ng-bind-html="buttonTxt|unicode"></button><br/><br/><br/>
+    <button type="button" class="btn btn-default btn-circle" ng-mousedown="press()" ng-mouseup="release()">Ääni kuuluu</button>
+  </div>
+  <br/><br/>
+  <div class="progress">
+    <div class="progress-bar" role="progressbar" ng-style="progressstyle"></div>
+  </div>
+
+</div>
+
+<script type="text/ng-template" id="finishedModal.html">
+    <div class="modal-header">
+        <h3 class="modal-title">Valmis!</h3>
+    </div>
+    <div class="modal-body">
+        <p>Kiitos!</p>
+        <p ng-show="frequency == 'f1'">
+          Seuraavaksi sama testi tehdään uudestaan toisella äänellä. Sulje tämä ilmoitus ja paina 'play'
+          kun olet valmis aloittamaan.
+        </p>
+        <p ng-show="(currentsession.mode == 'training') && (frequency == 'f2')">
+          Harjoituksen valmistelut on nyt tehty. Seuraavaksi sinut ohjataan takaisin
+          etusivulle, josta voit aloittaa kuunteluharjoituksia. <strong>Muistathan olla
+          koskematta tietokoneen äänenvoimakkuuden säätimiin harjoitusten aikana</strong>
+        </p>
+        <p ng-show="(currentsession.mode == 'baseline') && (frequency == 'f2')">
+          Seuraavaksi siirryt ensimmäiseen kuunteluharjoitukseen.
+        </p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
+    </div>
+</script>
