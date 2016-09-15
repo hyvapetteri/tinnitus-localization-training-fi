@@ -136,13 +136,8 @@ ttApp.filter('unicode', function($sce) {
 });
 
 ttApp.config(['hoodieProvider', function(hoodieProvider) {
-  hoodieProvider.url('http://127.0.0.1:6007');
+  hoodieProvider.url('http://127.0.0.1:6001');
 }]);
-
-ttApp.constant('APP_CONSTANTS', {
-  'DB_ADDRESS': 'http://127.0.0.1:6009',
-  'AUTH_NOT_AUTHENTICATED': 'auth-not-authenticated',
-});
 
 ttApp.run(function($rootScope, $window, $state, hoodieAccount) {
 
