@@ -4,9 +4,9 @@ angular.module('ttControllers')
 
   $scope.processInfo = function(info) {
 
-    if (!$scope.infoForm.$valid) {
-      return
-    }
+    //if (!$scope.infoForm.$valid) {
+    //  return
+    //}
 
     return hoodieStore.updateOrAdd('userinfo', 'info', $scope.info).then(function() {
       $location.path('/welcome');
