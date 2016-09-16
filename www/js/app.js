@@ -136,7 +136,7 @@ ttApp.filter('unicode', function($sce) {
 });
 
 ttApp.config(['hoodieProvider', function(hoodieProvider) {
-  hoodieProvider.url('http://127.0.0.1:6001');
+  hoodieProvider.url('http://hood001.org.aalto.fi');
 }]);
 
 ttApp.run(function($rootScope, $window, $state, hoodieAccount) {

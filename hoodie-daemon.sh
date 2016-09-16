@@ -39,7 +39,7 @@ case "$1" in
     sudo -u $hoodie_user \
     COUCH_URL=http://127.0.0.1:5984 \
     HOODIE_ADMIN_USER=couchadmin \
-    HOODIE_ADMIN_PASS="$HOODIE_ADMIN_PASS" \
+    HOODIE_ADMIN_PASS=$HOODIE_ADMIN_PASS \
     HOME=$apphome \
     node node_modules/hoodie-server/bin/start \
     1>>$stdoutfile \
