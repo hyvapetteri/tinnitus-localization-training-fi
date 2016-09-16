@@ -206,11 +206,12 @@ angular.module('ttControllers')
         f1: 1000,
         f2: avg_match
       }).then(function() {
-        return hoodieStore.add('settings','parameters', {
+        return hoodieStore.add('settings', {
+          id: 'parameters',
           f1: 1000,
           f2: avg_match
         }).catch(function() {
-          
+
         });
       }).then(function() {
         $location.path('/threshold');
