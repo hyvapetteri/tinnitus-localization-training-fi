@@ -1,6 +1,6 @@
 angular.module('ttControllers')
-    .controller('matchingCtrl', ['$scope', 'utils', 'webaudiocontext', 'hoodieStore', '$location',
-    function($scope, utils, webaudiocontext, hoodieStore, $location) {
+    .controller('matchingCtrl', ['$scope', 'utils', 'webaudiocontext', 'hoodieStore', '$location', '$uibModal',
+    function($scope, utils, webaudiocontext, hoodieStore, $location, $uibModal) {
 
   var audioCtx = webaudiocontext;
 
@@ -204,6 +204,7 @@ angular.module('ttControllers')
 
       for (var i = 0; i < 3; i++) {
         if (Math.abs($scope.tmpTinnitusMatches[i].freq - avg_match) > (0.2*avg_match)) {
+          $scope.play(); // pause
           $scope.openModal();
           return;
         }
@@ -240,13 +241,19 @@ angular.module('ttControllers')
           var tmp = {};
           tmp['tinnitusMatchesTryNumber' + $scope.tryNumber] = $scope.tmpTinnitusMatches;
           hoodieStore.update('session', $scope.session_key, tmp).then(function() {
-            $scope.tmpTinnitusMatches = [];
-            $scope.matchCounter = 1;
-            $scope.tryNumber += 1;
-            reset_audio();
+            $scope.reset_test();
+          }).catch(function(err) {
+            console.log(err);
           });
         }
       }]
     });
+  }
+
+  $scope.reset_test = function() {
+    $scope.tmpTinnitusMatches = [];
+    $scope.matchCounter = 1;
+    $scope.tryNumber += 1;
+    reset_audio();
   }
 }]);
