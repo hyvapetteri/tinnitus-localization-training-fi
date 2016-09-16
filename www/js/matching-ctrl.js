@@ -168,6 +168,8 @@ angular.module('ttControllers')
 
   $scope.matchCounter = 1;
   $scope.tmpTinnitusMatches = [];
+  $scope.tryNumber = 1;
+
   $scope.ready = function() {
 
     $scope.tmpTinnitusMatches.push({
@@ -194,11 +196,18 @@ angular.module('ttControllers')
       });
     } else {
       //console.log('four matches, going forward');
-      var avg_match = null;
-      for (i = 0; i < 3; i++) {
+      var avg_match = 0.0;
+      for (var i = 0; i < 3; i++) {
         avg_match += $scope.tmpTinnitusMatches[i].freq;
       }
       avg_match /= 3.0;
+
+      for (var i = 0; i < 3; i++) {
+        if (Math.abs($scope.tmpTinnitusMatches[i].freq - avg_match) > (0.2*avg_match)) {
+          $scope.openModal();
+          return;
+        }
+      }
 
       hoodieStore.update('session', $scope.session_key, {
         tinnitusMatches: $scope.tmpTinnitusMatches,
@@ -220,4 +229,24 @@ angular.module('ttControllers')
 
   }
 
+  $scope.openModal = function () {
+    var modalInstance = $uibModal.open({
+      templateUrl: 'notGoodModal.html',
+      scope: $scope,
+      controller: ['$scope','$uibModalInstance','$state', '$location', 'hoodieStore',
+                  function($scope, $uibModalInstance, $state, $location, hoodieStore) {
+        $scope.ok = function() {
+          $uibModalInstance.close();
+          var tmp = {};
+          tmp['tinnitusMatchesTryNumber' + $scope.tryNumber] = $scope.tmpTinnitusMatches;
+          hoodieStore.update('session', $scope.session_key, tmp).then(function() {
+            $scope.tmpTinnitusMatches = [];
+            $scope.matchCounter = 1;
+            $scope.tryNumber += 1;
+            reset_audio();
+          });
+        }
+      }]
+    });
+  }
 }]);
