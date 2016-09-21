@@ -18,7 +18,22 @@ angular.module('ttControllers')
   };
 
   $scope.onExit = function(event) {
-    return "All data will be lost!";
+    /*var modalInstance = $uibModal.open({
+      templateUrl: 'exitModal.html',
+      scope: $scope,
+      controller: ['$scope','$uibModalInstance','$state', '$location', 'hoodieStore',
+                  function($scope, $uibModalInstance, $state, $location, hoodieStore) {
+
+        $scope.ok = function() {
+          $uibModalInstance.close();
+        }
+      }]
+    });*/
+    if (!!$scope.currentsession) {
+      var dialogText = "Sinulla on käynnissä harjoituskerta. Ole hyvä ja lopeta harjoitus ennen sivulta poistumista.";
+      event.returnValue = dialogText;
+      return dialogText;
+    }
   };
 
   $window.onbeforeunload =  $scope.onExit;

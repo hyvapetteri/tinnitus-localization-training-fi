@@ -374,6 +374,7 @@ angular.module('ttControllers')
   }
 
   $scope.warmup = function(direction) {
+    $scope.counter++;
     update_location(direction);
   }
 
@@ -437,7 +438,8 @@ angular.module('ttControllers')
           $uibModalInstance.close();
           if ($scope.currentsession.stage == 'warmup') {
             hoodieStore.update('session', $scope.session_key, {
-              stage: 'training'
+              stage: 'training',
+              warmup_counter: $scope.counter
             }).then(function() {
               $state.reload();
             });
