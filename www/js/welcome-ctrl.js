@@ -31,7 +31,7 @@ angular.module('ttControllers')
 
   $scope.startNewSession = function(req_mode) {
     var mode = 'training';
-    if (!($scope.settings)) {
+    if ((!$scope.settings) || $scope.settings.mode == 'baseline' ) {
       mode = 'baseline';
     }
     if (!!req_mode) {

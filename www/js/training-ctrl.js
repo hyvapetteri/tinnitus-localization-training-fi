@@ -437,9 +437,11 @@ angular.module('ttControllers')
         $scope.ok = function() {
           $uibModalInstance.close();
           if ($scope.currentsession.stage == 'warmup') {
+            var active_exercise_tmp = $scope.currentsession.active_exercise;
+            active_exercise_tmp[$scope.currentsession.mode + '_' + $scope.which_freq + '_warmup'] = $scope.counter;
             hoodieStore.update('session', $scope.session_key, {
               stage: 'training',
-              warmup_counter: $scope.counter
+              active_exercise: active_exercise_tmp
             }).then(function() {
               $state.reload();
             });
@@ -459,7 +461,8 @@ angular.module('ttControllers')
                 f2_baseline_jnd: $scope.currentsession.f2_baseline_jnd,
                 f1: $scope.currentsession.f1,
                 f2: $scope.currentsession.f2,
-                'training_freq': training_freq
+                'training_freq': training_freq,
+                mode: 'training'
               }).then(function() {
                 return hoodieStore.update('session', $scope.session_key, {
                   stage: 'finished'

@@ -1,34 +1,50 @@
 angular.module('ttControllers')
     .controller('UserController', ['$scope', '$rootScope', 'hoodieAccount',
-    '$location', 'hoodieStore', '$window',
-    function($scope, $rootScope, hoodieAccount, $location, hoodieStore, $window) {
+    '$location', 'hoodieStore', '$window', '$uibModal',
+    function($scope, $rootScope, hoodieAccount, $location, hoodieStore, $window, $uibModal) {
 
   $scope.account = hoodieAccount;
 
   $scope.accountAction = {
     logout: function() {
       //console.log('logout')
-      return hoodieAccount.signOut().then(function() {
-        $scope.account = null;
-        $location.path('/welcome');
-      }).catch(function(err) {
-        console.log('error logging out: ' + err);
-      });
+      if (!!$scope.currentsession) {
+        var modalInstance = $uibModal.open({
+          templateUrl: 'exitModal.html',
+          scope: $scope,
+          controller: ['$scope','$uibModalInstance','$state', '$location', 'hoodieStore',
+                      function($scope, $uibModalInstance, $state, $location, hoodieStore) {
+
+            $scope.exit_ok = function() {
+              $uibModalInstance.close();
+              hoodieStore.update('session-key','current', {key: ''}).then(function() {
+                hoodieAccount.signOut().then(function() {
+                  $scope.account = null;
+                  $location.path('/welcome');
+                }).catch(function(err) {
+                  alert('Uloskirjautuminen ei onnistunut, syy: ' + err + ', ole hyvä ja lataa sivu uudestaan.');
+                });
+              })
+            }
+
+            $scope.exit_cancel = function() {
+              $uibModalInstance.close();
+              return;
+            }
+          }]
+        });
+      } else {
+        return hoodieAccount.signOut().then(function() {
+          $scope.account = null;
+          $location.path('/welcome');
+        }).catch(function(err) {
+          alert('Uloskirjautuminen ei onnistunut, syy: ' + err + ', ole hyvä ja lataa sivu uudestaan.');
+        });
+      }
     }
   };
 
   $scope.onExit = function(event) {
-    /*var modalInstance = $uibModal.open({
-      templateUrl: 'exitModal.html',
-      scope: $scope,
-      controller: ['$scope','$uibModalInstance','$state', '$location', 'hoodieStore',
-                  function($scope, $uibModalInstance, $state, $location, hoodieStore) {
-
-        $scope.ok = function() {
-          $uibModalInstance.close();
-        }
-      }]
-    });*/
     if (!!$scope.currentsession) {
       var dialogText = "Sinulla on käynnissä harjoituskerta. Ole hyvä ja lopeta harjoitus ennen sivulta poistumista.";
       event.returnValue = dialogText;

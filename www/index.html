@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="tinnitusTraining" ng-controller="UserController">
+<html ng-app="tinnitusTraining" ng-controller="UserController" manifest="tinnitusapp.appcache">
     <head>
         <meta charset="UTF-8"></meta>
         <title>Kuunteluharjoitus tinnitukseen</title>
@@ -23,7 +23,7 @@
                 </a>
               </span>
               <span class="pull-right header-text">
-                <p ng-show="!!account.username">Käyttäjä {{account.username}} - <a href="#" ng-click="accountAction.logout()" class="navbar-link">kirjaudu ulos</a></p>
+                <p ng-show="!!account.username">Käyttäjä {{account.username}} - <a href="" ng-click="accountAction.logout()" class="navbar-link">kirjaudu ulos</a></p>
                 <p ng-show="!account.username"><a href="#/login" class="navbar-link">Kirjaudu sisään</a></p>
               </span>
           </nav>
@@ -70,14 +70,15 @@
 
   <script type="text/ng-template" id="exitModal.html">
       <div class="modal-header">
-          <h3 class="modal-title">I'm a modal!</h3>
+          <h3 class="modal-title">Odota!</h3>
       </div>
       <div class="modal-body">
-        Don't leave before saving!
+        Sinulla on harjoituskerta käynnissä, haluatko varmasti lopettaa harjoituskerran
+        ja kirjautua ulos?
       </div>
       <div class="modal-footer">
-          <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
-          <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+          <button class="btn btn-primary" type="button" ng-click="exit_ok()">Kyllä</button>
+          <button class="btn btn-warning" type="button" ng-click="exit_cancel()">Peruuta</button>
       </div>
   </script>
 </html>

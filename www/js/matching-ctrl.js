@@ -182,7 +182,7 @@ angular.module('ttControllers')
 
     $scope.matchCounter += 1;
 
-    var currentStage = ($scope.matchCounter > 3)?'threshold':'matching';
+    var currentStage = ($scope.matchCounter > 3)?'threshold_f1':'matching';
 
     if ($scope.matchCounter <= 3) {
       hoodieStore.update('session', $scope.session_key, {
@@ -219,7 +219,8 @@ angular.module('ttControllers')
         return hoodieStore.add('settings', {
           id: 'parameters',
           f1: 1000,
-          f2: avg_match
+          f2: avg_match,
+          mode: 'baseline'
         }).catch(function() {
 
         });

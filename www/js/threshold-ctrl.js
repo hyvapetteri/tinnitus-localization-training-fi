@@ -50,18 +50,19 @@ angular.module('ttControllers')
   $scope.progressstyle = {'width': '0%'};
 
   var freq = null;
-  if (!('th_f1' in $scope.currentsession)) {
+  if ($scope.currentsession.stage == 'threshold_f1') {
     freq = $scope.settings.f1;
     $scope.frequency = 'f1';
-  } else if (!('th_f2' in $scope.currentsession)) {
+  } else if ($scope.currentsession.stage == 'threshold_f2') {
     freq = $scope.settings.f2;
     $scope.frequency = 'f2';
   } else {
-    hoodieStore.update('session', $scope.session_key, {
+    $location.path('/welcome');
+  /*  hoodieStore.update('session', $scope.session_key, {
       stage: 'training'
     }).then(function() {
       $location.path('/training');
-    });
+    }); */
   }
   bqf1.frequency.value = freq;
   bqf2.frequency.value = freq;
@@ -131,7 +132,8 @@ angular.module('ttControllers')
           if ($scope.frequency == 'f1') {
             hoodieStore.update('session', $scope.session_key, {
               th_f1: avg_th,
-              f1_turns: $scope.turns
+              f1_turns: $scope.turns,
+              stage: 'threshold_f2'
             }).then(function() {
               $state.reload();
             });
