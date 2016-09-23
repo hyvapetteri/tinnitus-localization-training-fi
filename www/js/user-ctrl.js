@@ -1,9 +1,18 @@
 angular.module('ttControllers')
     .controller('UserController', ['$scope', '$rootScope', 'hoodieAccount',
-    '$location', 'hoodieStore', '$window', '$uibModal',
-    function($scope, $rootScope, hoodieAccount, $location, hoodieStore, $window, $uibModal) {
+    '$location', 'hoodieStore', '$window', '$uibModal', 'session', 'settings',
+    function($scope, $rootScope, hoodieAccount, $location, hoodieStore, $window, $uibModal, session, settings) {
+
+  $scope.currentsession = session;
+  if (session == null) {
+    $scope.session_key = '';
+  } else {
+    $scope.session_key = session.id;
+  }
+  $scope.settings = settings;
 
   $scope.account = hoodieAccount;
+  $scope.session_initialized = false;
 
   $scope.accountAction = {
     logout: function() {
@@ -56,14 +65,6 @@ angular.module('ttControllers')
 
   //$scope.currentsession = hoodieObject.bind('session','current');
 
-
-  hoodieStore.find('session-key', 'current').then(function(session_key) {
-    $scope.session_key = session_key.key;
-    hoodieStore.find('session', session_key.key).then(function(session) {
-      $scope.currentsession = session;
-    });
-  });
-
   hoodieStore.on('session-key:current:change', function(event, session_key) {
     //console.log(event);
     if (event == 'remove') {
@@ -76,24 +77,20 @@ angular.module('ttControllers')
         delete $scope.currentsession;
         return;
       }
-      hoodieStore.find('session', session_key.key).then(function(session) {
-        $scope.currentsession = session;
+      hoodieStore.find('session', session_key.key).then(function(new_session) {
+        $scope.currentsession = new_session;
       });
     }
   });
 
-  hoodieStore.on('session:change', function(event, session) {
-    if (session.id == $scope.session_key) {
-      $scope.currentsession = session;
+  hoodieStore.on('session:change', function(event, new_session) {
+    if (new_session.id == $scope.session_key) {
+      $scope.currentsession = new_session;
     }
   });
 
-  hoodieStore.find('settings','parameters').then(function(settings) {
-    $scope.settings = settings;
-  });
-
-  hoodieStore.on('settings:parameters:change', function(event, settings) {
-    $scope.settings = settings;
+  hoodieStore.on('settings:parameters:change', function(event, new_settings) {
+    $scope.settings = new_settings;
   });
 
   hoodieAccount.on('signin', function() {

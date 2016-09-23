@@ -5,6 +5,8 @@ angular.module('ttControllers')
 
   'use strict';
 
+  console.log($scope.currentsession.mode + ' ' + $scope.currentsession.stage);
+
   var finishedAudio = document.querySelector('#finishedAudio');
   finishedAudio.volume = 0.02;
 

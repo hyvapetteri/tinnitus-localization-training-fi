@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="tinnitusTraining" ng-controller="UserController" manifest="tinnitusapp.appcache">
+<html ng-app="tinnitusTraining" manifest="tinnitusapp.appcache">
     <head>
         <meta charset="UTF-8"></meta>
         <title>Kuunteluharjoitus tinnitukseen</title>
@@ -12,36 +12,8 @@
     </head>
 
     <body>
-
-      <div class="container">
-
-        <div class="header clearfix">
-          <nav>
-              <span class="pull-left" style="margin-right: 15px">
-                <a href="#/welcome">
-                  <img src="images/hy-logo.gif"></img>
-                </a>
-              </span>
-              <span class="pull-right header-text">
-                <p ng-show="!!account.username">Käyttäjä {{account.username}} - <a href="" ng-click="accountAction.logout()" class="navbar-link">kirjaudu ulos</a></p>
-                <p ng-show="!account.username"><a href="#/login" class="navbar-link">Kirjaudu sisään</a></p>
-              </span>
-          </nav>
-          <h3 class="text-muted">Kuunteluharjoitus</h3>
-
-        </div>
-
-        <div id="main">
-            <div class="row">
-              <div ui-view class="col-sm-12"></div>
-            </div>
-        </div>
-
-        <footer class="footer">
-            <p class="text-muted"><small>Helsingin yliopistollinen keskussairaala, Korvaklinikka<small></p>
-        </footer>
-
-      </div> <!-- container -->
+      <div ui-view>
+      </div>
     </body>
 
       <!-- dependencies -->

@@ -12,44 +12,64 @@ function($stateProvider, $urlRouterProvider) {
   $urlRouterProvider.otherwise('/welcome');
 
   $stateProvider
-  .state('loggedIn', {
+  .state('main', {
+    abstract: true,
+    templateUrl: 'html/main.html',
+    controller: 'UserController',
+    resolve: {
+      hoodieStore: 'hoodieStore',
+      session: function(hoodieStore) {
+        return hoodieStore.find('session-key', 'current').then(function(session_key) {
+          return hoodieStore.find('session', session_key.key);
+        }).catch(function(err) {
+          return null;
+        });
+      },
+      settings: function(hoodieStore) {
+        return hoodieStore.find('settings', 'parameters').catch(function(err) {
+          return null;
+        });
+      }
+    }
+  })
+  .state('main.loggedIn', {
     abstract: true,
     template: '<ui-view/>',
     data: {
       requireLogin: true
     }
   })
-  .state('loggedIn.training', {
+  .state('main.loggedIn.training', {
     url: '/training',
     templateUrl: 'html/training.html',
     controller: 'trainingCtrl'
   })
-  .state('loggedIn.matching', {
+  .state('main.loggedIn.matching', {
     url: '/matching',
     templateUrl: 'html/matching.html',
     controller: 'matchingCtrl'
   })
-  .state('loggedIn.soundcheck', {
+  .state('main.loggedIn.soundcheck', {
     url: '/soundcheck',
     templateUrl: 'html/soundcheck.html',
     controller: 'soundcheckCtrl'
   })
-  .state('loggedIn.vas', {
+  .state('main.loggedIn.vas', {
     url: '/vas',
     templateUrl: 'html/vas.html',
     controller: 'vasController'
   })
-  .state('loggedIn.threshold', {
+  .state('main.loggedIn.threshold', {
     url: '/threshold',
     templateUrl: 'html/threshold.html',
     controller: 'thresholdCtrl'
   })
-  .state('loggedIn.info', {
+  .state('main.loggedIn.info', {
     url: '/info',
     templateUrl: 'html/userinfo.html',
     controller: 'infoController'
   })
-  .state('welcome', {
+  .state('main.welcome', {
     url: '/welcome',
     templateUrl: 'html/welcome.html',
     controller: 'welcomeCtrl',
@@ -57,14 +77,14 @@ function($stateProvider, $urlRouterProvider) {
       requireLogin: false
     }
   })
-  .state('login', {
+  .state('main.login', {
     url: '/login',
     templateUrl: 'html/login.html',
     data: {
       requireLogin: false
     }
   })
-  .state('signup', {
+  .state('main.signup', {
     url: '/signup',
     templateUrl: 'html/signup.html',
     data: {
