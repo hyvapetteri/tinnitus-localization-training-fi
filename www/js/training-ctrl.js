@@ -5,8 +5,6 @@ angular.module('ttControllers')
 
   'use strict';
 
-  console.log($scope.currentsession.mode + ' ' + $scope.currentsession.stage);
-
   var finishedAudio = document.querySelector('#finishedAudio');
   finishedAudio.volume = 0.02;
 
@@ -159,19 +157,16 @@ angular.module('ttControllers')
     });
 
     active_exercise[$scope.currentsession.mode + '_' + $scope.which_freq + '_record'] = training_history;
-    hoodieStore.update('session', $scope.session_key, {
-      'active_exercise': active_exercise
-    }).then(function() {
-      $scope.msg = '';
-      if ($scope.currentsession.mode == 'training') {
-        $scope.progressstyle = {'width': '' + (($scope.counter*100)/50) + '%'};
-      } else if ($scope.currentsession.mode == 'baseline') {
-        $scope.progressstyle = {'width': '' + ((turn_counter * 100)/turn_max) + '%'};
-      }
-      $scope.answer_disabled = true;
-      $scope.play_disabled = false;
-      $scope.direction = 0;
-    });
+
+    $scope.msg = '';
+    if ($scope.currentsession.mode == 'training') {
+      $scope.progressstyle = {'width': '' + (($scope.counter*100)/50) + '%'};
+    } else if ($scope.currentsession.mode == 'baseline') {
+      $scope.progressstyle = {'width': '' + ((turn_counter * 100)/turn_max) + '%'};
+    }
+    $scope.answer_disabled = true;
+    $scope.play_disabled = false;
+    $scope.direction = 0;
 
     if (($scope.currentsession.mode == 'training') && ($scope.counter == 50)) {
       $scope.play_disabled = true;
