@@ -437,11 +437,10 @@ angular.module('ttControllers')
         $scope.ok = function() {
           $uibModalInstance.close();
           if ($scope.currentsession.stage == 'warmup') {
-            var active_exercise_tmp = $scope.currentsession.active_exercise;
-            active_exercise_tmp[$scope.currentsession.mode + '_' + $scope.which_freq + '_warmup'] = $scope.counter;
+            active_exercise[$scope.currentsession.mode + '_' + $scope.which_freq + '_warmup'] = $scope.counter;
             hoodieStore.update('session', $scope.session_key, {
               stage: 'training',
-              active_exercise: active_exercise_tmp
+              'active_exercise': active_exercise
             }).then(function() {
               $state.reload();
             });
