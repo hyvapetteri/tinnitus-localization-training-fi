@@ -80,16 +80,23 @@ angular.module('ttControllers')
     if ($scope.playing == 'init') {
       src.start();
       intervalPointer = $interval(update_volume, 100);
-      $scope.buttonTxt = 'Mute';
+      $scope.buttonTxt = 'Aloita uudestaan';
       $scope.playing = 'playing';
     } else if ($scope.playing == 'paused') {
       gainNode.connect(audioCtx.destination);
       intervalPointer = $interval(update_volume, 100);
-      $scope.buttonTxt = 'Mute';
+      $scope.buttonTxt = 'Aloita uudestaan';
       $scope.playing = 'playing';
     } else if ($scope.playing == 'playing') {
       gainNode.disconnect(audioCtx.destination);
       $interval.cancel(intervalPointer);
+
+      direction = 1; // -1 or 1, down or up
+      volume = utils.dbtoa(-50);
+      gainNode.gain.value = volume;
+      $scope.turns = [];
+      $scope.reversed_counter = 0;
+      $scope.progressstyle = {'width': '0%'};
       $scope.buttonTxt = '&#9658; Play';
       $scope.playing = 'paused';
     }

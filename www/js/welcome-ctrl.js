@@ -7,14 +7,19 @@ angular.module('ttControllers')
       return ((obj.type == 'session') && (obj.id !== $scope.session_key));
     }).then(function(sessions) {
       var training_sessions = 0;
+      var total_sessions = [];
       for (var i = 0; i < sessions.length; i++) {
-        if (sessions[i].mode == 'training') {
+        if (sessions[i].mode == 'baseline') {
+          total_sessions.push(sessions[i]);
+        }
+        if ((sessions[i].mode == 'training') && ('exercises' in sessions[i])) {
+          total_sessions.push(sessions[i]);
           training_sessions += 1;
         }
       }
       $scope.training_sessions = training_sessions;
 
-      $scope.sessions = sessions;
+      $scope.sessions = total_sessions;
       if (training_sessions >= 8) {
         hoodieStore.update('settings','parameters', {
           training_target_reached: true

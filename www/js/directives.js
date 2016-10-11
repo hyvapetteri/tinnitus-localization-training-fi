@@ -59,3 +59,31 @@ ttApp.directive('checkPassword', function() {
     }
   }
 });
+
+ttApp.directive('thresholdButtonDown', function() {
+  return function(scope, element, attr) {
+    var event_id = 'mousedown';
+    if ('ontouchstart' in element) {
+      event_id = 'touchstart';
+    }
+
+    element.on(event_id, function(e) {
+      scope.$apply(function() {
+        scope.$eval(attr.thresholdButtonDown);
+      });
+    });
+  }
+}).directive('thresholdButtonUp', function() {
+  return function(scope, element, attr) {
+    var event_id = 'mouseup';
+    if ('ontouchend' in element) {
+      event_id = 'touchend';
+    }
+
+    element.on(event_id, function(e) {
+      scope.$apply(function() {
+        scope.$eval(attr.thresholdButtonUp);
+      });
+    });
+  }
+});
