@@ -103,11 +103,17 @@ angular.module('ttControllers')
   }
 
   $scope.press = function() {
+    if ($scope.playing !== 'playing') {
+      return;
+    }
     direction = -1;
     $scope.turns.push(gainNode.gain.value);
   }
 
   $scope.release = function() {
+    if ($scope.playing !== 'playing') {
+      return;
+    }
     direction = 1;
     $scope.reversed_counter += 1;
     $scope.progressstyle = {'width': '' + (($scope.reversed_counter*100)/10) + '%'};

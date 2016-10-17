@@ -5,6 +5,11 @@ angular.module('ttControllers')
 
   'use strict';
 
+  hoodieStore.update('session', $scope.session_key, {
+    'foo': 'barrrr'
+  });
+  
+
   var finishedAudio = document.querySelector('#finishedAudio');
   finishedAudio.volume = 0.02;
 

@@ -83,6 +83,7 @@ ttApp.directive('thresholdButtonDown', function() {
     element.on(event_id, function(e) {
       scope.$apply(function() {
         scope.$eval(attr.thresholdButtonUp);
+        element.blur();
       });
     });
   }
