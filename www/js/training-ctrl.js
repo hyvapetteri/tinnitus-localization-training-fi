@@ -5,11 +5,6 @@ angular.module('ttControllers')
 
   'use strict';
 
-  hoodieStore.update('session', $scope.session_key, {
-    'foo': 'barrrr'
-  });
-  
-
   var finishedAudio = document.querySelector('#finishedAudio');
   finishedAudio.volume = 0.02;
 
@@ -31,7 +26,18 @@ angular.module('ttControllers')
   }
 
   $scope.freq = $scope.settings[$scope.which_freq];
-  $scope.gain = $scope.currentsession['th_' + $scope.which_freq] * utils.dbtoa(50);
+  $scope.show_volume = false;
+  if (('trainingvol_' + $scope.which_freq) in $scope.settings) {
+    $scope.trainingvol = $scope.settings['trainingvol_' + $scope.which_freq];
+  } else {
+    $scope.show_volume = ($scope.currentsession.mode == 'baseline');
+    $scope.trainingvol = 50;
+  }
+  $scope.gain = $scope.currentsession['th_' + $scope.which_freq] * utils.dbtoa($scope.trainingvol);
+  $scope.$watch('trainingvol', function() {
+    $scope.gain = $scope.currentsession['th_' + $scope.which_freq] * utils.dbtoa($scope.trainingvol);
+  });
+
   var training_history = [];
 
   var fs = audioCtx.sampleRate;
@@ -444,11 +450,19 @@ angular.module('ttControllers')
               stage: 'training',
               'active_exercise': active_exercise
             }).then(function() {
+              var tmpsettings = {};
+              tmpsettings['trainingvol_' + $scope.which_freq] = $scope.trainingvol;
+              return hoodieStore.updateOrAdd('settings', 'parameters', tmpsettings);
+            }).then(function() {
               $state.reload();
             });
           } else {
             if ($scope.currentsession.mode == 'baseline' && $scope.which_freq == 'f1') {
-              $state.reload();
+              hoodieStore.update('session', $scope.session_key, {
+                stage: 'warmup'
+              }).then(function() {
+                $state.reload();
+              });
             } else if ($scope.currentsession.mode == 'baseline' && $scope.which_freq == 'f2') {
               var rnd = Math.random();
               var training_freq = '';

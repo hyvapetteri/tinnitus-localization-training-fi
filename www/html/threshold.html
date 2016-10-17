@@ -16,13 +16,12 @@
     Tämä sama toimenpide toistetaan kaksi kertaa eri korkuisilla äänillä.
   </p>
 
-  <div class="text-center"
-       style="-moz-user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; user-select: none;">
+  <div class="text-center">
     <br/>
     <button type="button" class="btn" ng-click="play()" ng-bind-html="buttonTxt|unicode"></button><br/><br/><br/>
     <button style="button" class="btn btn-default btn-circle"
-       threshold-button-down="press()"
-       threshold-button-up="release()">Ääni kuuluu</button>
+       ng-mousedown="press()"
+       ng-mouseup="release()">Ääni kuuluu</button>
   </div>
   <br/><br/>
   <div class="progress">

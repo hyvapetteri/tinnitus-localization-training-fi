@@ -59,7 +59,7 @@ ttApp.directive('checkPassword', function() {
     }
   }
 });
-
+/*
 ttApp.directive('thresholdButtonDown', function() {
   return function(scope, element, attr) {
     var event_id = 'mousedown';
@@ -88,3 +88,4 @@ ttApp.directive('thresholdButtonDown', function() {
     });
   }
 });
+*/

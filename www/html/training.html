@@ -50,6 +50,16 @@
       lämmittelyvaiheessa: kuuntele vasemmalle liikkuva ääni painamalla vasenta nuolinäppäintä
       ja oikealle liikkuva ääni painamalla oikeaa nuolinäppäintä.
     </p>
+    <p ng-show="show_volume">
+      <strong>HUOM!</strong> Nyt ensimmäisellä kerralla määritämme myös harjoitusäänten
+      voimakkuuden.
+      Lähtökohtana on että äänenvoimakkuus olisi 50 dB, mutta mikäli tämä on epämukavan
+      kova ääni, voit säätää ääntä hieman hiljaisemmalle. Kokeile laskea äänenvoimakkuutta
+      asteittain ja valitse mahdollisimman korkea äänenvoimakkuus joka ei kuitenkaan
+      tunnu epämukavalta.
+      Äänenvoimakkuutta ei voi enää seuraavilla harjoituskerroilla säätää uudestaan
+      vaan koko ohjelma tehdään samalla asetuksella, joten tee tämä kohta huolellisesti.
+    </p>
   </span>
 
   <div class="row">
@@ -71,6 +81,13 @@
         </div>
       </div>
       <div class="panel-body text-center" ng-show="currentsession.stage == 'warmup'">
+        <span ng-show="show_volume">
+          <label for="trainingvol">
+            Äänenvoimakkuus
+          </label>
+          <input id="trainingvol" name="trainingvol" type="range" min="20" max="50" step="5" ng-model="trainingvol"></input>
+          <span class="help-block">Voimakkuus: {{trainingvol}} dB</span>
+        </span>
         <button type="button" class="btn" ng-disabled="answer_disabled" ng-click="warmup('left');play();">(&#x2190;) Vasemmalle</button>
         <button type="button" class="btn" ng-disabled="answer_disabled" ng-click="warmup('right');play();">Oikealle (&#x2192;)</button>
         <br/><br/>
