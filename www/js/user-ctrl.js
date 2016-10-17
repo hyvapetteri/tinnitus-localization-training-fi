@@ -93,13 +93,15 @@ angular.module('ttControllers')
     $scope.settings = new_settings;
   });
 
-  hoodieAccount.on('signin', function() {
+  hoodieAccount.on('signup signin', function() {
     $scope.account = hoodieAccount;
   });
+
   hoodieAccount.on('signout', function() {
     $scope.account = null;
     delete $scope.currentsession;
   });
+
   hoodieAccount.on('error:unauthenticated', function(err, username) {
     $scope.account = null;
     delete $scope.currentsession;
