@@ -136,6 +136,8 @@ angular.module('ttControllers')
   $scope.openModal = function(avg_th) {
     var modalInstance = $uibModal.open({
       templateUrl: 'finishedModal.html',
+      backdrop: 'static',
+      keyboard: false,
       scope: $scope,
       controller: ['$scope','$uibModalInstance','$state', '$location', 'hoodieStore',
                   function($scope, $uibModalInstance, $state, $location, hoodieStore) {

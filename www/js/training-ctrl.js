@@ -53,18 +53,23 @@ angular.module('ttControllers')
     if (active_exercise.difficulty == 'easy') {
       shift_db = jnd + 4.0;
     } else if (active_exercise.difficulty == 'medium') {
-      shift_db = jnd + 1.0;
+      shift_db = jnd + 0.5;
     } else if (active_exercise.difficulty == 'hard') {
-      shift_db = jnd;
+      shift_db = jnd - 0.5;
+      if (shift_db <= 0) {
+        shift_db = 0.1;
+      }
     }
   }
+  var abs_shift = Math.abs(shift_db);
   var ans_hist = [null,null,null];
 
   $scope.counter = 0;
   $scope.correct_counter = 0;
   var turns = [];
   var turn_counter = 0;
-  var turn_max = 12;
+  var turn_max = 12; // continue for 12 turns
+  var th_avg_n = 6; // take last 6 turns for the average when counting the threshold
   var previous_update = 'init';
   var step = 2.0;
   $scope.progressstyle = {'width': '0%'};
@@ -77,47 +82,115 @@ angular.module('ttControllers')
   //var itd_s = 0.001;
   //var itd_samples = fs * lag_s;
 
+  $scope.correct = undefined;
+  if ($scope.currentsession.stage == 'warmup') {
+    $scope.answer_disabled = false;
+  } else {
+    $scope.answer_disabled = true;
+  }
+  $scope.play_disabled = false;
+
+
+  // play is invoked by either clicking the play-button or by pressing spacebar
+  $scope.play = function() {
+    if ($scope.currentsession.stage !== 'warmup') {
+      update_location();
+    } else {
+      $scope.answer_disabled = true;
+    }
+
+    $scope.msg = 'Kuuntele';
+    $scope.play_disabled = true;
+
+    var stimulus = utils.white_noise(nSamples);
+
+    /*
+    // sin-cos law
+    l_gain = Math.cos(((90.0 + angle)/180.0) * (Math.PI/2));
+    l_gain_2 = Math.cos(((90.0 + angle + shift)/180.0) * (Math.PI/2));
+    r_gain = Math.sin(((90.0 + angle)/180.0) * (Math.PI/2));
+    r_gain_2 = Math.sin(((90.0 + angle + shift)/180.0) * (Math.PI/2));
+    */
+
+    // ILD
+    // given in decibels.
+    // Start at ILD = 0 and introduce the ILD by subtracting from left channel
+    // and adding to right channel. If the shift is negative, it is added to left
+    // and subtracted from right. The ILD is split in half between channels to add up
+    // to the desired ILD
+    var l_gain = 1.0;
+    var l_gain_2 = 1.0 * utils.dbtoa(-0.5 * shift_db);
+    var r_gain = 1.0;
+    var r_gain_2 = 1.0 * utils.dbtoa(0.5 * shift_db);
+
+    var l_output = buffer.getChannelData(0);
+    var r_output = buffer.getChannelData(1);
+
+    for (var i = 0; i < fs * len_s; i++) {
+      l_output[i] = stimulus[i] * l_gain;
+      r_output[i] = stimulus[i] * r_gain;
+    }
+
+    for (var i = fs * len_s; i < fs * (len_s + len_pause); i++) {
+      l_output[i] = stimulus[i] * 0;
+      r_output[i] = stimulus[i] * 0;
+    }
+
+    for (var i = fs * (len_s + len_pause); i < nSamples; i++) {
+      l_output[i] = stimulus[i] * l_gain_2;
+      r_output[i] = stimulus[i] * r_gain_2;
+    }
+
+    // Filter the signal
+    var bqf1 = audioCtx.createBiquadFilter();
+    bqf1.type = 'bandpass';
+    bqf1.frequency.value = $scope.freq;
+    bqf1.Q.value = 6;
+
+    var bqf2 = audioCtx.createBiquadFilter();
+    bqf2.type = 'bandpass';
+    bqf2.frequency.value = $scope.freq;
+    bqf2.Q.value = 6;
+
+    var bqf3 = audioCtx.createBiquadFilter();
+    bqf3.type = 'bandpass';
+    bqf3.frequency.value = $scope.freq;
+    bqf3.Q.value = 10;
+
+    var gainNode = audioCtx.createGain();
+    gainNode.gain.value = $scope.gain;
+
+    var src = audioCtx.createBufferSource();
+    src.buffer = buffer;
+    src.onended = function() {
+      $scope.$apply(function() {
+        gainNode.disconnect(audioCtx.destination);
+        // enable answering
+        if ($scope.currentsession.stage !== 'warmup') {
+          $scope.msg = 'Liikkuiko ääni vasemmalle vai oikealle?';
+        } else {
+          $scope.msg = "Kokeile uudestaan tai lopeta lämmittely painamalla 'Valmis'";
+        }
+        $scope.answer_disabled = false;
+      });
+    }
+    src.connect(bqf1);
+    bqf1.connect(bqf2);
+    bqf2.connect(bqf3);
+    bqf3.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    src.start();
+
+    $scope.audiostatus = audioCtx.state;
+  }
+
+
+  // Before playing a sound, update the location of the sound. During warmup,
+  // the direction of the shift can be determined by the subject, but during
+  // training and baseline testing, it is random.
+
   function update_location(direction) {
     //angle = Math.random() * 10.0 - 5.0; // from -5° (left) to +5° (right)
-    var abs_shift = Math.abs(shift_db);
-
-    if (turn_counter <= 2) {
-      step = 2.0;
-    } else if ((turn_counter > 2) && (turn_counter <= 9)) {
-      step = 0.4;
-    } else if ((turn_counter > 9) && (turn_counter <= turn_max)) {
-      step = 0.2;
-    }
-
-    if ($scope.currentsession.mode == 'baseline') {
-      if ((previous_update == 'init') && (ans_hist[ans_hist.length - 1] == 'corr')) {
-        abs_shift -= step;
-      }
-
-      if ((previous_update !== 'init') && ans_hist.every(a => a == 'corr')) {
-        if (previous_update == 'up') {
-          turn_counter++;
-          turns.push(abs_shift);
-        }
-        ans_hist = [null,null,null];
-        abs_shift -= step;
-        previous_update = 'down';
-      } else if (ans_hist[ans_hist.length - 1] == 'wrong') {
-        if (previous_update == 'down') {
-          turn_counter++;
-          turns.push(abs_shift);
-        }
-        abs_shift += step;
-        previous_update = 'up';
-      }
-
-    }
-
-    if (abs_shift > 10.0) {
-      abs_shift = 10.0;
-    } else if (abs_shift <= 0.0) {
-      abs_shift = 0.0;
-    }
 
     if (!!direction) {
       if (direction == 'right') {
@@ -139,13 +212,11 @@ angular.module('ttControllers')
     }
   }
 
-  $scope.correct = undefined;
-  if ($scope.currentsession.stage == 'warmup') {
-    $scope.answer_disabled = false;
-  } else {
-    $scope.answer_disabled = true;
-  }
-  $scope.play_disabled = false;
+
+  // after playing the sound, subject gives an answer either by clicking
+  // or by pressing arrow keys. Then we collect their answer and see if they
+  // were correct. Finally we check whether we've reached the end of training
+  // or the baseline test. If so, show a popup and direct back to front page
 
   $scope.check_answer = function(ans) {
     $scope.counter++;
@@ -179,6 +250,62 @@ angular.module('ttControllers')
     $scope.play_disabled = false;
     $scope.direction = 0;
 
+    // If this is the baseline test, check if we need to increase or decrease
+    // the ILD. Also, keep track of the turning points for determining the JND
+    if ($scope.currentsession.mode == 'baseline') {
+
+      // in the first stage, just decrease the ILD until we get one wrong answer
+      if ((previous_update == 'init') && (ans_hist[ans_hist.length - 1] == 'corr')) {
+        abs_shift -= step;
+      }
+
+      if ((previous_update !== 'init') && ans_hist.every(a => a == 'corr')) {
+        // we are here when all three previous answers have been correct. Now
+        // we decrease the ILD (i.e. go "down"). If the previous update in
+        // ILD was "up", it means that now we are turning downwards again.
+        if (previous_update == 'up') {
+          turn_counter++;
+          turns.push(abs_shift);
+        }
+        // clear the answer queue, so that the subject has to get three more
+        // correct before decreasing the ILD again
+        ans_hist = [null,null,null];
+        abs_shift -= step;
+        previous_update = 'down';
+      } else if (ans_hist[ans_hist.length - 1] == 'wrong') {
+        // every time there is a wrong answer, go up in step size.
+        // if the previous step was a decrease in ILD, consider
+        // this update a turn. If the previous update wasn't "down",
+        // it means that this was either the first wrong after "init", or
+        // we are in the middle of an increasing trend (continue going "up").
+        if (previous_update == 'down') {
+          turn_counter++;
+          turns.push(abs_shift);
+        }
+        abs_shift += step;
+        previous_update = 'up';
+      }
+
+      if (abs_shift > 10.1) {
+        abs_shift = 10.1;
+      } else if (abs_shift <= 0.0) {
+        abs_shift = 0.0;
+      }
+
+      // if the current update included a turn, update the step size for
+      // the next update. The step size defined here is used immediately
+      // for the next position update.
+      if (turn_counter < 2) {
+        step = 2.0;
+      } else if ((turn_counter >= 2) && (turn_counter < 8)) {
+        step = 0.4;
+      } else if ((turn_counter >= 8) && (turn_counter < turn_max)) {
+        step = 0.2;
+      }
+
+    }
+
+    // check if we've reached the end of training/baseline
     if (($scope.currentsession.mode == 'training') && ($scope.counter == 50)) {
       $scope.play_disabled = true;
       $scope.answer_disabled = true;
@@ -192,16 +319,18 @@ angular.module('ttControllers')
         'active_exercise': {},
         'exercises': exercises
       }).then(function() {
-        $scope.openModal();
+        finishTraining();
+        //$scope.openModal();
       });
-    } else if (($scope.currentsession.mode == 'baseline') && (turn_counter == (turn_max))) {
+    } else if (($scope.currentsession.mode == 'baseline') && (turn_counter == turn_max)) {
       $scope.play_disabled = true;
       $scope.answer_disabled = true;
       var baseline = 0.0;
-      for (var i = 6; i < turn_max; i++) {
+      for (var i = (turn_max - th_avg_n); i < turn_max; i++) {
         baseline += turns[i];
       }
-      baseline /= turn_max;
+      baseline /= th_avg_n;
+
       var tmp = {};
       angular.copy($scope.currentsession, tmp);
       tmp[$scope.which_freq + '_baseline_jnd'] = baseline;
@@ -215,176 +344,19 @@ angular.module('ttControllers')
       tmp.active_exercise = {};
       tmp['exercises'] = exercises;
       hoodieStore.update('session', $scope.session_key, tmp).then(function() {
-        $scope.openModal();
+        finishTraining();
+        //$scope.openModal();
       });
     }
 
-    //console.log('done checking');
-    //update_location();
   }
 
-  $scope.play = function() {
-    if ($scope.currentsession.stage !== 'warmup') {
-      update_location();
-    } else {
-      $scope.answer_disabled = true;
-    }
-
-    //console.log('play');
-    $scope.msg = 'Kuuntele';
-    $scope.play_disabled = true;
-    //$('#msg').html('Playing');
-    var stimulus = utils.white_noise(nSamples);
-
-    /*
-    // sin-cos law
-    l_gain = Math.cos(((90.0 + angle)/180.0) * (Math.PI/2));
-    l_gain_2 = Math.cos(((90.0 + angle + shift)/180.0) * (Math.PI/2));
-    r_gain = Math.sin(((90.0 + angle)/180.0) * (Math.PI/2));
-    r_gain_2 = Math.sin(((90.0 + angle + shift)/180.0) * (Math.PI/2));
-    */
-
-
-    // ITD
-
-    /*
-    if (itd_samples > 0) {
-      var leading_output = buffer.getChannelData(1); // R
-      var lagging_output = buffer.getChannelData(0); // L
-    }
-    else {
-      var leading_output = buffer.getChannelData(0); // L
-      var lagging_output = buffer.getChannelData(1); // R
-    }
-
-    for (var i = 0; i < itd_samples; i++) {
-      leading_output[i] = stimulus[i];
-      lagging_output[i] = 0.0;
-    }
-    for (var i = itd_samples; i < fs * len_s; i++) {
-      leading_output[i] = stimulus[i];
-      lagging_output[i] = stimulus[i - itd_samples];
-    }
-    for (var i = fs*len_s; i < fs*len_s + itd_samples; i++) {
-      leading_output[i] = 0.0;
-      lagging_output[i] = stimulus[i - itd_samples];
-    }
-    for (var i = fs*len_s + itd_samples; i < fs * (len_s + len_pause); i++) {
-      leading_output[i] = 0;
-      lagging_output[i] = 0;
-    }
-    // recalculate ITD and do same again
-    var new_itd_s = itd_s + d_itd;
-    var new_itd_samples = new_itd_s * fs;
-
-    if (Math.sign(new_itd_samples) !== Math.sign(itd_samples)) {
-      var tmp = leading_output;
-      var leading_output = lagging_output;
-      var lagging_output = tmp;
-    }
-
-    var halfway = fs * (len_s + len_pause);
-    for (var i = halfway; i < halfway + new_itd_samples; i++) {
-      leading_output[i] = stimulus[i];
-      lagging_output[i] = 0.0;
-    }
-    for (var i = halfway + new_itd_samples; i < halfway + fs * len_s; i++) {
-      leading_output[i] = stimulus[i];
-      lagging_output[i] = stimulus[i - new_itd_samples];
-    }
-    for (var i = fs*len_s; i < fs*len_s + new_itd_samples; i++) {
-      leading_output[i] = 0.0;
-      lagging_output[i] = stimulus[i - new_itd_samples];
-    }
-    for (var i = fs*len_s + new_itd_samples; i < fs * (len_s + len_pause); i++) {
-      leading_output[i] = 0;
-      lagging_output[i] = 0;
-    }
-    */
-    // ILD
-    // square root law
-    //var l_gain = Math.sqrt(1 - (90.0 + angle)/180.0);
-    //var l_gain_2 = Math.sqrt(1 - (90.0 + angle + shift)/180.0);
-    //var r_gain = Math.sqrt((90.0 + angle)/180.0);
-    //var r_gain_2 = Math.sqrt((90.0 + angle + shift)/180.0);
-
-    // ILD
-    // decibels
-    var l_gain = 1.0;
-    var l_gain_2 = 1.0 * utils.dbtoa(-shift_db);
-    var r_gain = 1.0;
-    var r_gain_2 = 1.0 * utils.dbtoa(shift_db);
-
-    var l_output = buffer.getChannelData(0);
-    var r_output = buffer.getChannelData(1);
-
-    for (var i = 0; i < fs * len_s; i++) {
-      l_output[i] = stimulus[i] * l_gain;
-      r_output[i] = stimulus[i] * r_gain;
-    }
-
-    for (var i = fs * len_s; i < fs * (len_s + len_pause); i++) {
-      l_output[i] = stimulus[i] * 0;
-      r_output[i] = stimulus[i] * 0;
-    }
-
-    for (var i = fs * (len_s + len_pause); i < nSamples; i++) {
-      l_output[i] = stimulus[i] * l_gain_2;
-      r_output[i] = stimulus[i] * r_gain_2;
-    }
-
-//buffer.copyToChannel(stimulus.map(function(x) x * l_gain), 0);
-//buffer.copyToChannel(stimulus.map(function(x) x * r_gain), 1);
-
-    var bqf1 = audioCtx.createBiquadFilter();
-    bqf1.type = 'bandpass';
-    bqf1.frequency.value = $scope.freq;
-    bqf1.Q.value = 6;
-
-    var bqf2 = audioCtx.createBiquadFilter();
-    bqf2.type = 'bandpass';
-    bqf2.frequency.value = $scope.freq;
-    bqf2.Q.value = 6;
-
-    var bqf3 = audioCtx.createBiquadFilter();
-    bqf3.type = 'bandpass';
-    bqf3.frequency.value = $scope.freq;
-    bqf3.Q.value = 10;
-
-    var gainNode = audioCtx.createGain();
-    gainNode.gain.value = $scope.gain;
-
-    var src = audioCtx.createBufferSource();
-    src.buffer = buffer;
-    src.onended = function() {
-      $scope.$apply(function() {
-        gainNode.disconnect(audioCtx.destination);
-        //console.log('ended!');
-        // enable answering
-        if ($scope.currentsession.stage !== 'warmup') {
-          $scope.msg = 'Liikkuiko ääni vasemmalle vai oikealle?';
-        } else {
-          $scope.msg = "Kokeile uudestaan tai lopeta lämmittely painamalla 'Valmis'";
-        }
-        $scope.answer_disabled = false;
-        //$('#playBtn').prop('disabled',false);
-      });
-    }
-    src.connect(bqf1);
-    bqf1.connect(bqf2);
-    bqf2.connect(bqf3);
-    bqf3.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
-    src.start();
-
-    //console.log('start src ' + buffer.getChannelData(0).length);
-    $scope.audiostatus = audioCtx.state;
-  }
 
   $scope.warmup = function(direction) {
     $scope.counter++;
     update_location(direction);
   }
+
 
   angular.element($window).bind('keydown', function(e) {
     //console.log('keypress ' + e.key);
@@ -428,82 +400,97 @@ angular.module('ttControllers')
     $scope.$apply();
   });
 
-  //$('#counter').html('Trial ' +counter + '/50');
 
   $scope.$on('$destroy', function() {
     angular.element($window).unbind('keydown');
   });
 
-  $scope.openModal = function () {
+  $scope.finishWarmup = function() {
+    active_exercise[$scope.currentsession.mode + '_' + $scope.which_freq + '_warmup'] = $scope.counter;
+    hoodieStore.update('session', $scope.session_key, {
+      stage: 'training',
+      'active_exercise': active_exercise
+    }).then(function() {
+      var tmpsettings = {};
+      tmpsettings['trainingvol_' + $scope.which_freq] = $scope.trainingvol;
+      return hoodieStore.updateOrAdd('settings', 'parameters', tmpsettings);
+    }).then(function() {
+      $scope.openModal('reload', 'warmup_done');
+    });
+  }
+
+  function finishTraining() {
     finishedAudio.play();
 
+    if ($scope.currentsession.mode == 'baseline') {
+      if ($scope.which_freq == 'f1') {
+        hoodieStore.update('session', $scope.session_key, {
+          stage: 'warmup'
+        }).then(function() {
+          $scope.openModal('reload', 'f1_baseline_done');
+        });
+      } else if ($scope.which_freq == 'f2') {
+        var rnd = Math.random();
+        var training_freq = '';
+        if (rnd < 0.5) {
+          training_freq = 'f1';
+        } else {
+          training_freq = 'f2';
+        }
+
+        hoodieStore.updateOrAdd('settings', 'parameters', {
+          f1_baseline_jnd: $scope.currentsession.f1_baseline_jnd,
+          f2_baseline_jnd: $scope.currentsession.f2_baseline_jnd,
+          f1: $scope.currentsession.f1,
+          f2: $scope.currentsession.f2,
+          'training_freq': training_freq,
+          mode: 'training'
+        }).then(function() {
+          return hoodieStore.update('session', $scope.session_key, {
+            stage: 'finished'
+          });
+        }).then(function(session) {
+          return hoodieStore.update('session-key','current', {key: ''});
+        }).then(function() {
+          $scope.openModal('done', 'f2_baseline_done');
+        }).catch(function(err) {
+          console.log('error: ' + err);
+        });
+      }
+    } else if ($scope.currentsession.mode == 'training') {
+      hoodieStore.update('session', $scope.session_key, {
+        stage: 'finished'
+      }).then(function() {
+        if ((active_exercise.difficulty == 'hard') && (active_exercise.correct_counter >= 43)) {
+          return hoodieStore.update('settings','parameters', {
+            training_target_reached: true
+          }).then(function() {
+            return hoodieStore.update('session-key','current', {key: ''});
+          });
+        }
+      }).then(function() {
+        $scope.openModal('done', 'training_done');
+      });
+    }
+  }
+
+  $scope.openModal = function(next_stage, message) {
     var modalInstance = $uibModal.open({
       templateUrl: 'finishedModal.html',
+      backdrop: 'static',
+      keyboard: false,
       scope: $scope,
       controller: ['$scope','$uibModalInstance','$state', '$location', 'hoodieStore',
                   function($scope, $uibModalInstance, $state, $location, hoodieStore) {
+
+        $scope.popup_message = message;
+
         $scope.ok = function() {
           $uibModalInstance.close();
-          if ($scope.currentsession.stage == 'warmup') {
-            active_exercise[$scope.currentsession.mode + '_' + $scope.which_freq + '_warmup'] = $scope.counter;
-            hoodieStore.update('session', $scope.session_key, {
-              stage: 'training',
-              'active_exercise': active_exercise
-            }).then(function() {
-              var tmpsettings = {};
-              tmpsettings['trainingvol_' + $scope.which_freq] = $scope.trainingvol;
-              return hoodieStore.updateOrAdd('settings', 'parameters', tmpsettings);
-            }).then(function() {
-              $state.reload();
-            });
-          } else {
-            if ($scope.currentsession.mode == 'baseline' && $scope.which_freq == 'f1') {
-              hoodieStore.update('session', $scope.session_key, {
-                stage: 'warmup'
-              }).then(function() {
-                $state.reload();
-              });
-            } else if ($scope.currentsession.mode == 'baseline' && $scope.which_freq == 'f2') {
-              var rnd = Math.random();
-              var training_freq = '';
-              if (rnd < 0.5) {
-                training_freq = 'f1';
-              } else {
-                training_freq = 'f2';
-              }
-              hoodieStore.updateOrAdd('settings', 'parameters', {
-                f1_baseline_jnd: $scope.currentsession.f1_baseline_jnd,
-                f2_baseline_jnd: $scope.currentsession.f2_baseline_jnd,
-                f1: $scope.currentsession.f1,
-                f2: $scope.currentsession.f2,
-                'training_freq': training_freq,
-                mode: 'training'
-              }).then(function() {
-                return hoodieStore.update('session', $scope.session_key, {
-                  stage: 'finished'
-                });
-              }).then(function(session) {
-                return hoodieStore.update('session-key','current', {key: ''});
-              }).then(function() {
-                $location.path('/welcome');
-              }).catch(function(err) {
-                console.log('error: ' + err);
-              });
-            } else {
-              hoodieStore.update('session', $scope.session_key, {
-                stage: 'finished'
-              }).then(function() {
-                if ((active_exercise.difficulty == 'hard') && (active_exercise.correct_counter >= 43)) {
-                  return hoodieStore.update('settings','parameters', {
-                    training_target_reached: true
-                  }).then(function() {
-                    return hoodieStore.update('session-key','current', {key: ''});
-                  });
-                }
-              }).then(function() {
-                $location.path('/welcome');
-              });
-            }
+          if ((next_stage == 'reload')) {
+            $state.reload();
+          } else if (next_stage == 'done') {
+            $location.path('/welcome');
           }
         }
 

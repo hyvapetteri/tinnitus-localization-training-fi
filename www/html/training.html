@@ -93,7 +93,7 @@
         <br/><br/>
         <div ng-show="msg || (currentsession.mode == 'baseline')" style="height: 2em"><span style="vertical-align: middle">{{msg}}</span></div>
         <br/>
-        <button type="button" class="btn" ng-click="openModal();" ng-show="currentsession.stage == 'warmup'">Valmis</button>
+        <button type="button" class="btn" ng-click="finishWarmup();" ng-show="currentsession.stage == 'warmup'">Valmis</button>
       </div>
     </div>
   </div>
@@ -104,29 +104,29 @@
         <h3 class="modal-title">Valmis!</h3>
     </div>
     <div class="modal-body">
-      <span ng-hide="currentsession.stage == 'warmup'">
-        <p ng-if="(currentsession.mode == 'training') && !settings.training_target_reached">
+      <span ng-hide="popup_message == 'warmup_done'">
+        <p ng-if="(popup_message == 'training_done') && !settings.training_target_reached">
           Harjoitus on nyt valmis! Sait {{(correct_counter*100)/counter}}%
           vastauksistasi oikein! Seuraavaksi siirryt takaisin etusivulle, josta
           voit joko aloittaa uuden harjoituksen tai lopettaa harjoituskerran.
         </p>
-        <p ng-if="(currentsession.mode == 'training') && settings.training_target_reached">
+        <p ng-if="(popup_message == 'training_done') && settings.training_target_reached">
           Harjoitus on nyt valmis! Sait {{(correct_counter*100)/counter}}%
           vastauksistasi oikein ja olet saavuttanut harjoitustavoitteen!
           Palaa huomenna tekemään vielä viimeinen testi, josta selvitämme miten olet
           kehittynyt kuuntelutarkkuudessa.
         </p>
-        <p ng-if="(currentsession.mode == 'baseline') && (which_freq == 'f1')">
+        <p ng-if="popup_message == 'f1_baseline_done'">
           Kiitos! Seuraavaksi sama testi tehdään toisella äänellä!
         </p>
-        <p ng-if="(currentsession.mode == 'baseline') && (which_freq == 'f2')">
+        <p ng-if="popup_message == 'f2_baseline_done'">
           Kiitos! Ensimmäinen harjoituskerta on nyt valmis! Voit jatkaa huomenna
           harjoituksilla, joissa pyrimme kehittämään kuuntelutarkkuuttasi! Nämä
           samat testit tehdään uudestaan harjoittelun päätyttyä, jolloin saamme
           tietää miten olet parantanut kuuntelutaitoasi.
         </p>
       </span>
-      <span ng-show="currentsession.stage == 'warmup'">
+      <span ng-show="popup_message == 'warmup_done'">
         <p>
           Toivottavasti olet nyt lämmitellyt tarpeeksi, seuraavaksi siirrymme
           varsinaiseen harjoitukseen!
