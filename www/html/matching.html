@@ -78,12 +78,15 @@
     <div class="modal-body">
       Tinnitusäänen määrittäminen ei onnistunut, sillä äänenkorkeuksissa oli liian
       suuret erot. Tee tämä kohta uudestaan ja pyri joka kerralla mahdollisimman
-      tarkasti etsimään tinnitustasi vastaava ääni. Mikäli tinnitusäänesi
-      vaihtelee paljon tai et muusta syystä useamman kerran jälkeenkään pääse
-      tästä vaiheesta eteenpäin, ota yhteyttä tutkimusryhmän jäseniin.
+      tarkasti etsimään tinnitustasi vastaava ääni.
+      <p ng-show="currentsession.mode == 'training'">
+        Mikäli et <u>useamman yrityksen jälkeenkään</u> pääse eteenpäin, voit ohittaa
+        tämän vaiheen painamalla 'Ohita vaihe' alta.
+      </p>
     </div>
 
     <div class="modal-footer">
-        <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
+        <button class="btn btn-primary" type="button" ng-click="ok()">Yritä uudestaan</button>
+        <button ng-show="currentsession.mode == 'training'" class="btn btn-warning" type="button" ng-click="skip()">Ohita vaihe</button>
     </div>
 </script>

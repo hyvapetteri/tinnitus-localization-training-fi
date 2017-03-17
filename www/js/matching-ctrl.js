@@ -249,6 +249,18 @@ angular.module('ttControllers')
             console.log(err);
           });
         }
+
+        $scope.skip = function() {
+          $uibModalInstance.close();
+          var tmp = {};
+          tmp['tinnitusMatchesTryNumber' + $scope.tryNumber] = $scope.tmpTinnitusMatches;
+          tmp['stage'] = 'threshold_f1';
+          hoodieStore.update('session', $scope.session_key, tmp).then(function() {
+            $location.path('/threshold');
+          }).catch(function(err) {
+            console.log(err);
+          });
+        }
       }]
     });
   }
