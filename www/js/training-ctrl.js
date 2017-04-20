@@ -31,7 +31,7 @@ angular.module('ttControllers')
     $scope.trainingvol = $scope.settings['trainingvol_' + $scope.which_freq];
   } else {
     $scope.show_volume = ($scope.currentsession.mode == 'baseline');
-    $scope.trainingvol = 50;
+    $scope.trainingvol = 20;
   }
   $scope.gain = $scope.currentsession['th_' + $scope.which_freq] * utils.dbtoa($scope.trainingvol);
   $scope.$watch('trainingvol', function() {
@@ -438,13 +438,17 @@ angular.module('ttControllers')
           training_freq = 'f2';
         }
 
-        hoodieStore.updateOrAdd('settings', 'parameters', {
+        var settings_mode = 'training'
+        if ('training_freq' in $scope.settings) {
+          training_freq = $scope.settings.training_freq;
+          settings_mode = 'finished';
+        }
+
+        hoodieStore.update('settings', 'parameters', {
           f1_baseline_jnd: $scope.currentsession.f1_baseline_jnd,
           f2_baseline_jnd: $scope.currentsession.f2_baseline_jnd,
-          f1: $scope.currentsession.f1,
-          f2: $scope.currentsession.f2,
           'training_freq': training_freq,
-          mode: 'training'
+          mode: settings_mode
         }).then(function() {
           return hoodieStore.update('session', $scope.session_key, {
             stage: 'finished'
@@ -461,13 +465,13 @@ angular.module('ttControllers')
       hoodieStore.update('session', $scope.session_key, {
         stage: 'finished'
       }).then(function() {
-        if ((active_exercise.difficulty == 'hard') && (active_exercise.correct_counter >= 43)) {
-          return hoodieStore.update('settings','parameters', {
-            training_target_reached: true
-          }).then(function() {
-            return hoodieStore.update('session-key','current', {key: ''});
-          });
-        }
+//        if ((active_exercise.difficulty == 'hard') && (active_exercise.correct_counter >= 43)) {
+//          return hoodieStore.update('settings','parameters', {
+//            training_target_reached: true
+//          }).then(function() {
+          return hoodieStore.update('session-key','current', {key: ''});
+//          });
+//        }
       }).then(function() {
         $scope.openModal('done', 'training_done');
       });

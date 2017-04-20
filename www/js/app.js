@@ -157,9 +157,10 @@ ttApp.filter('unicode', function($sce) {
 
 ttApp.config(['hoodieProvider', function(hoodieProvider) {
   hoodieProvider.url('http://hood001.org.aalto.fi');
+  //hoodieProvider.url('http://127.0.0.1:6007');
 }]);
 
-ttApp.run(function($rootScope, $window, $state, hoodieAccount) {
+ttApp.run(function($rootScope, $window, $state, $document, hoodieAccount) {
 
   $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState,
       fromParams) {
@@ -170,5 +171,9 @@ ttApp.run(function($rootScope, $window, $state, hoodieAccount) {
       $state.go('welcome');
     }
 
+  });
+
+  rootScope.$on('$stateChangeSuccess', function() {
+    $document[0].body.scrollTop = $document[0].documentElement.scrollTop = 0;
   });
 });
