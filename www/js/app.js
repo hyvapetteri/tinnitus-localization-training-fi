@@ -173,7 +173,7 @@ ttApp.run(function($rootScope, $window, $state, $document, hoodieAccount) {
 
   });
 
-  rootScope.$on('$stateChangeSuccess', function() {
+  $rootScope.$on('$stateChangeSuccess', function() {
     $document[0].body.scrollTop = $document[0].documentElement.scrollTop = 0;
   });
 });

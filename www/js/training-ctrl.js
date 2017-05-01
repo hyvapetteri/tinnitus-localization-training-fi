@@ -464,12 +464,12 @@ angular.module('ttControllers')
     } else if ($scope.currentsession.mode == 'training') {
       hoodieStore.update('session', $scope.session_key, {
         stage: 'finished'
-      }).then(function() {
+//      }).then(function() {
 //        if ((active_exercise.difficulty == 'hard') && (active_exercise.correct_counter >= 43)) {
 //          return hoodieStore.update('settings','parameters', {
 //            training_target_reached: true
 //          }).then(function() {
-          return hoodieStore.update('session-key','current', {key: ''});
+//          return hoodieStore.update('session-key','current', {key: ''});
 //          });
 //        }
       }).then(function() {
