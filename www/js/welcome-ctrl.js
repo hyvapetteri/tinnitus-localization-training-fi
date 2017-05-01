@@ -8,11 +8,17 @@ angular.module('ttControllers')
     }).then(function(sessions) {
       var training_sessions = 0;
       var total_sessions = [];
+      var training_days = [];
       for (var i = 0; i < sessions.length; i++) {
         if (sessions[i].mode == 'baseline') {
           total_sessions.push(sessions[i]);
         }
+        var session_date = new Date(sessions[i].createdAt);
+        var datestring = session_date.getDay() + '-' + session_date.getMonth() + '-' + session_date.getFullYear();
         if ((sessions[i].mode == 'training') && ('exercises' in sessions[i])) {
+          if (training_days.indexOf(datestring) < 0) {
+            training_days.push(datestring);
+          }
           total_sessions.push(sessions[i]);
           training_sessions += 1;
         }
@@ -20,7 +26,7 @@ angular.module('ttControllers')
       $scope.training_sessions = training_sessions;
 
       $scope.sessions = total_sessions;
-      if (training_sessions >= 8) {
+      if (training_days.length >= 8) {
         hoodieStore.update('settings','parameters', {
           training_target_reached: true
         });
