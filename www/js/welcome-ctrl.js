@@ -21,7 +21,7 @@ angular.module('ttControllers')
           total_sessions.push(sessions[i]);
         }
         var session_date = new Date(sessions[i].createdAt);
-        var datestring = session_date.getDay() + '-' + session_date.getMonth() + '-' + session_date.getFullYear();
+        var datestring = session_date.getDate() + '-' + session_date.getMonth() + '-' + session_date.getFullYear();
         if ((sessions[i].mode == 'training') && ('exercises' in sessions[i])) {
           if (training_days.indexOf(datestring) < 0) {
             training_days.push(datestring);
