@@ -1,0 +1,119 @@
+<div>
+  <div class="page-header">
+    <h1>Tinnituskysely (THI)</h1>
+  </div>
+  <p class="lead">Tämän kyselykaavakkeen tarkoituksena on tunnistaa niitä ongelmia,
+    joita tinnitus saattaa teille aiheuttaa. Vastatkaa kysymyksiin
+    KYLLÄ, JOSKUS tai EI rastittamalla sopiva vaihtoehto kunkin kysymyksen kohdalla.
+    Vastatkaa jokaiseen kysymykseen.
+  </p>
+
+
+  <iframe src="html/null.html" name="null"
+    style="display:none"></iframe>
+
+  <form name="thiForm"
+    action="null.html" target="null" method="post"
+    ng-submit="processQuestionnaire(info)"
+    novalidate form-autofill-fix role="form">
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th></th>
+        <th></th>
+        <th class="text-center">KYLLÄ</th>
+        <th class="text-center">JOSKUS</th>
+        <th class="text-center">EI</th>
+      </tr>
+    </thead>
+
+    <tr ng-repeat="q in questionList" ng-form="qform" ng-class="{ 'danger': thiForm.$submitted && qform.$error.required }">
+      <td>{{$index+1}}</td>
+      <td>{{q.question}}</td>
+      <td class="text-center">
+        <input type="radio"
+          name="{{q.key}}"
+          ng-model="info[q.key]"
+          id="{{q.key}}_kylla"
+          value="kylla"
+          required="true">
+      </td>
+      <td class="text-center">
+        <input type="radio"
+          name="{{q.key}}"
+          ng-model="info[q.key]"
+          id="{{q.key}}_joskus"
+          value="joskus"
+          required="true">
+      </td>
+      <td class="text-center">
+        <input type="radio"
+          name="{{q.key}}"
+          ng-model="info[q.key]"
+          id="{{q.key}}_ei"
+          value="ei"
+          required="true">
+      </td>
+    </tr>
+  </table>
+  <p class="text-center">
+    <div class="form-group">
+      <label for="loudnessvas">
+        Kuinka <strong>kovaa tai voimakasta</strong> on tinnituksenne
+        keskimäärin ollut viimeisen kuukauden aikana?
+      </label>
+      <span class="help-block">(0 = ei tinnitusta, 100 = kovin kuviteltavissa oleva ääni)</span>
+      <input id="loudnessvas" name="loudnessvas" type="range" min="0" max="100" step="1" ng-model="info.loudnessvas"></input>
+      <span class="help-block" ng-show="!info.loudnessvas">Valitse sopiva arvo liukuvalitsimella</span>
+      <span class="help-block" ng-show="!!info.loudnessvas">Voimakkuus: {{info.loudnessvas}}</span>
+    </div>
+
+    <div class="form-group">
+      <label for="annoyancesvas">
+        Kuinka paljon tinnitus on keskimäärin <strong>ärsyttänyt</strong> teitä viimeisen
+        kuukauden aikana?
+      </label>
+      <span class="help-block">(0 = ei lainkaan, 100 = ärsyttää pahimmalla kuviteltavissa olevalla määrällä)</span>
+      <input id="annoyancevas" name="annoyancevas" type="range" min="0" max="100" step="1" ng-model="info.annoyancevas"></input>
+      <span class="help-block" ng-show="!info.annoyancevas">Valitse sopiva arvo liukuvalitsimella</span>
+      <span class="help-block" ng-show="!!info.annoyancevas">Häiritsevyys: {{info.annoyancevas}}</span>
+    </div>
+
+    <div class="form-group">
+      <label for="effectvas">
+        Kuinka paljon tinnitus on keskimäärin <strong>vaikuttanut elämäänne</strong>
+        viimeisen kuukauden aikana?
+      </label>
+      <span class="help-block">(0 = ei lainkaan, 100 = vaikuttaa suurimmalla kuviteltavissa olevalla tavalla)</span>
+      <input id="effectvas" name="effectvas" type="range" min="0" max="100" step="1" ng-model="info.effectvas"></input>
+      <span class="help-block" ng-show="!info.effectvas">Valitse sopiva arvo liukuvalitsimella</span>
+      <span class="help-block" ng-show="!!info.effectvas">Vaikutus elämään: {{info.effectvas}}</span>
+    </div>
+  </p>
+
+  <p class="text-center">
+    <button type="submit" class="btn btn-default">Tallenna</button>
+    <div class="help-block" ng-show="thiForm.$error.message">
+      <span>{{thiForm.$error.message}}</span>
+    </div>
+    <div class="help-block has-error text-center" ng-show="thiForm.$submitted">
+      <span ng-show="thiForm.$error.required">Täytä kaikki lomakkeen kohdat! Kysymykset, joista
+      vastaus puuttuu, on merkitty punaisella.</span>
+    </div>
+  </p>
+  </form>
+
+</div>
+
+<script type="text/ng-template" id="thiModal.html">
+    <div class="modal-header">
+        <h3 class="modal-title">Kiitos vastauksestasi!</h3>
+    </div>
+    <div class="modal-body">
+      Kiitos vastauksestasi! Palaat nyt etusivulle, josta voit kirjautua ulos.
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
+    </div>
+</script>

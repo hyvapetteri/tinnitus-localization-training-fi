@@ -7,8 +7,8 @@
       Tervetuloa HYKS kuulokeskuksen tinnituspotilaille tarkoitettuun kuunteluharjoitteluohjelmaan!
     </p>
     <p>
-      Ole hyvä ja <a href="#/login">kirjaudu sisään</a> aloittaaksesi harjoittelun,
-      tai <a href="#/signup">rekisteröidy</a> tutkimukseen mikäli sinulla ei ole
+      Ole hyvä ja <a href="#/login"><span class="glyphicon glyphicon-log-in"></span> kirjaudu sisään</a> aloittaaksesi harjoittelun,
+      tai <a href="#/signup" style="white-space: nowrap"><span class="glyphicon glyphicon-user"></span> rekisteröidy</a> tutkimukseen mikäli sinulla ei ole
       vielä käyttäjätunnusta!
     </p>
   </div>
@@ -43,45 +43,70 @@
 
 <div class="row" ng-show="!!account.username">
   <div class="col-sm-6">
-    <h4>Toiminnot</h4>
-    <p ng-show="!currentsession">
-      <a href="#" ng-hide="settings.training_target_reached" ng-click="$event.preventDefault(); startNewSession()">Aloita uusi harjoituskerta</a>
-      <a href="#" ng-show="settings.training_target_reached" ng-click="$event.preventDefault(); startNewSession('baseline')">Tee testi</a>
-    </p>
-    <p ng-show="!!currentsession">Käynnissä olevalla harjoituskerralla olet
-      suorittanut
-      <span ng-show="currentsession.exercises.length > 1">
-      {{currentsession.exercises.length}} harjoitusta:</span>
-      <span ng-show="currentsession.exercises.length == 1"> yhden harjoituksen:</span>
-    </p>
-      <ul>
-        <li ng-repeat="exercise in currentsession.exercises">
-          {{exercise.difficulty}} harjoitus, {{(exercise.correct_counter * 100)/50}}% oikein
-        </li>
-      </ul>
-    <p ng-show="!!currentsession">
-      <span ng-show="(currentsession.mode !== 'baseline')">
-        <a href="#" ng-show="(currentsession.preparations == 'done')" ng-click="$event.preventDefault(); startNewExercise()">Aloita uusi harjoitus</a>
-        <a href="#/vas" ng-show="(currentsession.preparations !== 'done')">Tee harjoitusvalmistelut</a>
-      </span>
-      <a href="#/vas" ng-show="currentsession.mode == 'baseline'">Aloita testi</a><br/>
-      <a href="#" ng-click="$event.preventDefault(); finishSession()">Lopeta harjoituskerta</a>
-    </p>
-  </div>
-  <div class="col-sm-6" ng-show="!!sessions.length">
-    <h4>Harjoituskertoja tähän mennessä: {{training_sessions}} </h4>
-    <ul>
-      <li ng-repeat="session in sessions | orderBy: 'createdAt'">
-        <span ng-show="session.mode == 'baseline'">Testikerta</span>
-        <span ng-show="session.mode == 'training'">Harjoituskerta</span>
-        {{session.createdAt | date:'longDate'}}
-        <ul ng-show="session.mode !== 'baseline'">
-          <li ng-repeat="exercise in session.exercises">
-            {{exercise.difficulty}} harjoitus, {{(exercise.correct_counter * 100)/50}}% oikein
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Toiminnot</h3>
+      </div>
+      <div class="panel-body">
+        <p ng-show="!currentsession">
+          <button class="btn btn-default" ng-hide="settings.training_target_reached" ng-click="startNewSession()"><span class="glyphicon glyphicon-star-empty"></span>&ensp;Aloita uusi harjoituskerta</button>
+          <button class="btn btn-default" ng-show="settings.training_target_reached" ng-click="startNewSession('baseline')"><span class="glyphicon glyphicon-play-circle"></span>&ensp;Tee testi</button>
+          <br/>
+        </p>
+        <p ng-show="!!currentsession">
+          <span ng-show="!!currentsession.exercises">
+            Käynnissä olevalla harjoituskerralla olet
+            suorittanut
+            <span ng-show="currentsession.exercises.length > 1">
+            {{currentsession.exercises.length}} harjoitusta:</span>
+            <span ng-show="currentsession.exercises.length == 1"> yhden harjoituksen:</span>
+          </span>
+          <span ng-show="!currentsession.exercises">
+            Tällä harjoituskerralla ei ole suoritettu vielä harjoituksia. Aloita uusi
+            harjoitus alta.
+          </span>
+        </p>
+        <ul>
+          <li ng-repeat="exercise in currentsession.exercises">
+            {{vaikeustasot[exercise.difficulty]}} harjoitus, {{(exercise.correct_counter * 100)/50}}% oikein
           </li>
         </ul>
-      </li>
-    </ul>
+        <p ng-show="!!currentsession">
+          <span ng-show="(currentsession.mode !== 'baseline')">
+            <button class="btn btn-default" ng-show="(currentsession.preparations == 'done')" ng-click="startNewExercise()"><span class="glyphicon glyphicon-plus"></span>&ensp;Aloita uusi harjoitus</button>
+            <a class="btn btn-default" href="#/vas" ng-show="(currentsession.preparations !== 'done')"><span class="glyphicon glyphicon-cog"></span>&ensp;Tee harjoitusvalmistelut</a>
+            <br/>
+          </span>
+          <a class="btn btn-default" href="#/vas" ng-show="currentsession.mode == 'baseline'"><span class="glyphicon glyphicon-arrow-right"></span>&ensp;Aloita testi</a><br/>
+          <button class="btn btn-default" ng-click="finishSession()"><span class="glyphicon glyphicon-ok"></span>&ensp;Lopeta harjoituskerta</button><br/>
+          <a class="btn btn-default" href="#/thi" ng-show="!!account.username && settings.training_target_reached"><span class="glyphicon glyphicon-list-alt"></span>&ensp;Tee tinnituskysely</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-6" ng-show="!!sessions.length">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Harjoitushistoria</h3>
+      </div>
+      <div class="panel-body">
+        <h4>Harjoituskertoja tähän mennessä: {{training_sessions}} </h4>
+        <span ng-hide="true">training days: {{training_days.length}}</span>
+        <ul>
+          <li ng-repeat="session in sessions | orderBy: 'createdAt'">
+            <span ng-show="session.mode == 'baseline'">Testikerta</span>
+            <span ng-show="session.mode == 'training'">Harjoituskerta</span>
+            {{session.createdAt | date:'longDate'}}
+            <ul ng-show="session.mode !== 'baseline'">
+              <li ng-repeat="exercise in session.exercises">
+                {{vaikeustasot[exercise.difficulty]}} harjoitus, {{(exercise.correct_counter * 100)/50}}% oikein
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
   </div>
 </div>
 

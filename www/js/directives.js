@@ -36,6 +36,8 @@ ttApp.directive('formAutofillFix', function ($timeout) {
               .trigger('input')
               .trigger('change')
               .trigger('keydown');
+            form = scope.$eval(attrs.name);
+            form.$setSubmitted();
             scope.$apply(attrs.ngSubmit);
           });
       });

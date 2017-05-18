@@ -69,6 +69,11 @@ function($stateProvider, $urlRouterProvider) {
     templateUrl: 'html/userinfo.html',
     controller: 'infoController'
   })
+  .state('main.loggedIn.thi', {
+    url: '/thi',
+    templateUrl: 'html/thi.html',
+    controller: 'thiController'
+  })
   .state('main.welcome', {
     url: '/welcome',
     templateUrl: 'html/welcome.html',

@@ -2,6 +2,13 @@ angular.module('ttControllers')
     .controller('welcomeCtrl', ['$scope', 'hoodieStore', '$uibModal', '$location',
     function($scope, hoodieStore, $uibModal, $location) {
 
+
+  $scope.vaikeustasot = {
+    'easy': 'helppo',
+    'medium': 'keskivaikea',
+    'hard': 'vaikea'
+  };
+
   $scope.listSessions = function() {
     hoodieStore.findAll(function(obj) {
       return ((obj.type == 'session') && (obj.id !== $scope.session_key));
@@ -23,6 +30,7 @@ angular.module('ttControllers')
           training_sessions += 1;
         }
       }
+      $scope.training_days = training_days;
       $scope.training_sessions = training_sessions;
 
       $scope.sessions = total_sessions;

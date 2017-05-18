@@ -99,13 +99,16 @@ angular.module('ttControllers')
 
   hoodieAccount.on('signout', function() {
     $scope.account = null;
+    delete $scope.session_key;
     delete $scope.currentsession;
+    delete $scope.settings;
   });
 
   hoodieAccount.on('error:unauthenticated', function(err, username) {
     $scope.account = null;
     delete $scope.currentsession;
     delete $scope.session_key;
+    delete $scope.settings;
     $location.path('/login');
   })
 
